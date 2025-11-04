@@ -72,6 +72,26 @@ To pull quote information, check out the sudo-defined-quoter package [here](http
 
 To view audits for sudoAMM v2 by Narya, Spearbit, and Cyfrin check out [here](https://github.com/sudoswap/v2-audits)
 
+## Deployment Scripts
+
+This repository includes comprehensive deployment scripts for deploying the entire sudoAMM v2 protocol. The scripts are located in the `script/` directory and include:
+
+- **Individual deployment scripts** for each component (Core, Bonding Curves, Router, Property Checkers, Settings)
+- **Master deployment script** (`DeployAll.s.sol`) for deploying everything at once
+- **Comprehensive documentation** including README, deployment checklist, and order reference
+
+For detailed instructions, see the [Deployment Guide](./script/README.md).
+
+Quick start:
+```bash
+# Configure your environment
+cp script/.env.example .env
+# Edit .env with your values
+
+# Deploy all contracts
+forge script script/DeployAll.s.sol:DeployAll --rpc-url $RPC_URL --broadcast --verify
+```
+
 ## Deployments
 
 The contracts have been deployed on Ethereum Mainnet to the following addresses:
