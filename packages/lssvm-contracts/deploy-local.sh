@@ -42,6 +42,7 @@ fi
 echo "Deploying to local Anvil node..."
 forge script script/DeployAll.s.sol:DeployAll \
   --rpc-url $RPC_URL \
+  --private-key $PRIVATE_KEY \
   --skip test \
   --broadcast \
   $SENDER_FLAG \

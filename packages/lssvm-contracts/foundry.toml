@@ -12,10 +12,12 @@ remappings = [
   "clones-with-immutable-args/=lib/clones-with-immutable-args/src/",
   "ds-test/=lib/clones-with-immutable-args/lib/ds-test/src/",
   "forge-std/=lib/forge-std/src/",
+  "stringutils/=lib/foundry-huff/lib/solidity-stringutils/src/",
+  "foundry-huff/=lib/foundry-huff/src/",
 ]
 verbosity = 1
 auto_detect_remappings = false
-exclude = ["src/test/**", "src/mocks/**", "lib/foundry-huff/**"]
+exclude = ["src/test/**", "src/mocks/**"]
 
 ffi = true
 solc_version = '0.8.26'

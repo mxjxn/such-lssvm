@@ -23,6 +23,10 @@ forge build
 
 ## Testing
 
+### Unit Tests
+
+Run the full test suite:
+
 ```bash
 forge test
 ```
@@ -33,6 +37,16 @@ forge coverage --report lcov
 genhtml lcov.info -o report --branch
 open report/index.html
 ```
+
+### Integration Tests
+
+After deploying contracts locally, test them with:
+
+```bash
+./test-integration.sh
+```
+
+For comprehensive testing documentation, see [TESTING.md](./TESTING.md).
 
 ## Deployment
 
