@@ -52,6 +52,55 @@ Pools can now also be made for ERC1155<>ETH or ERC1155<>ERC20 pairs. Pools for E
 - Improved events for tracking NFTs swapped in or out
 - A new `VeryFastRouter` which allows for handling all swap types (i.e. ERC721<>ETH, ERC721<>ERC20, ERC1155<>ETH, ERC1155<>ERC20), as well as an efficient method for handling **partial fills** when buying/selling multiple items from the same pool.
 
+## Miniapp
+
+This repository includes a **Farcaster miniapp** (`miniapp/`) that provides a user-friendly interface for interacting with NFT liquidity pools built on the LSSVM protocol.
+
+### Features
+
+- **Pool Discovery**: Enter pool addresses to view detailed pool information including spot price, delta, fees, and available NFTs
+- **Buy NFTs**: Purchase NFTs from liquidity pools using ETH or ERC20 tokens with real-time price quotes
+- **Sell NFTs**: Sell your NFTs to liquidity pools in exchange for tokens
+- **Shopping Cart**: Add multiple NFTs to a cart and checkout in a single transaction
+- **ERC721 & ERC1155 Support**: Full support for both NFT standards
+- **Transaction Tracking**: Monitor transaction status with explorer links
+- **Real-time Quotes**: Get up-to-date pricing information before trading, including fees and royalties
+
+### Tech Stack
+
+- **Next.js 14** with App Router
+- **Wagmi** for Ethereum interactions
+- **Farcaster Miniapp SDK** for Farcaster integration
+- **Tailwind CSS** for styling
+- **React Query** for data fetching
+
+### Quick Start
+
+1. Navigate to the miniapp directory:
+```bash
+cd miniapp
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Configure environment variables (see `miniapp/ENV_VARS.md` for details):
+```bash
+# Create .env.local with your contract addresses
+NEXT_PUBLIC_ROUTER_ADDRESS_8453=0x...
+NEXT_PUBLIC_FACTORY_ADDRESS_8453=0x...
+NEXT_PUBLIC_BASE_RPC_URL=https://base-mainnet.g.alchemy.com/v2/YOUR_API_KEY
+```
+
+4. Run the development server:
+```bash
+npm run dev
+```
+
+For detailed setup instructions, deployment guide, and architecture information, see the [Miniapp README](./miniapp/README.md).
+
 ## Building/Testing
 
 ```
