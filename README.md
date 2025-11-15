@@ -1,5 +1,22 @@
 # sudoAMM v2
 
+> **Note**: This repository contains the LSSVM (sudoAMM v2) protocol contracts from [sudoswap](https://github.com/sudoswap), reorganized into a Turborepo monorepo structure with additional tooling by [mxjxn](https://github.com/mxjxn).
+
+## Attribution
+
+### From sudoswap
+- **`packages/lssvm-contracts/`** - All Solidity contracts, and tests for the LSSVM (sudoAMM v2) protocol
+- Protocol architecture, features, and core functionality
+- Original documentation and protocol design
+
+### From mxjxn
+- **`apps/miniapp/`** - Farcaster miniapp for interacting with NFT liquidity pools
+- deployment scripts
+- Monorepo structure and Turborepo configuration
+- Integration tooling and developer experience improvements
+
+---
+
 sudoAMM v2 is focused on delivering several specific feature upgrades missing from sudoAMM v1. 
 
 Read the longform overview [here](https://blog.sudoswap.xyz/introducing-sudoswap-v2.html).
@@ -8,8 +25,8 @@ Read the longform overview [here](https://blog.sudoswap.xyz/introducing-sudoswap
 
 This repository is organized as a [Turborepo](https://turbo.build/repo) monorepo with the following structure:
 
-- **`apps/miniapp`** - Farcaster miniapp for interacting with NFT liquidity pools
-- **`packages/lssvm-contracts`** - Solidity contracts for the LSSVM protocol
+- **`apps/miniapp`** - Farcaster miniapp for interacting with NFT liquidity pools (by mxjxn)
+- **`packages/lssvm-contracts`** - Solidity contracts for the LSSVM protocol (from sudoswap)
 
 ### Getting Started
 
@@ -33,8 +50,9 @@ pnpm dev
 
 Diagram by [Gerard Pearson](https://twitter.com/gpersoon), prepared during the Spearbit [security audit](https://github.com/sudoswap/v2-audits/blob/main/spearbit.pdf).
 
-## Features
-The main focuses are:
+## Protocol Features (sudoswap)
+
+The main focuses of the LSSVM protocol are:
 - On-chain royalty support for all collections by default
 - Property-checking for pools to allow for specifying desired trait / ID orders
 - An opt-in on-chain structure for LPs and project owners that allows for revenue sharing
@@ -76,9 +94,9 @@ Pools can now also be made for ERC1155<>ETH or ERC1155<>ERC20 pairs. Pools for E
 - Improved events for tracking NFTs swapped in or out
 - A new `VeryFastRouter` which allows for handling all swap types (i.e. ERC721<>ETH, ERC721<>ERC20, ERC1155<>ETH, ERC1155<>ERC20), as well as an efficient method for handling **partial fills** when buying/selling multiple items from the same pool.
 
-## Miniapp
+## Miniapp (mxjxn)
 
-This repository includes a **Farcaster miniapp** (`apps/miniapp/`) that provides a user-friendly interface for interacting with NFT liquidity pools built on the LSSVM protocol.
+This repository includes a **Farcaster miniapp** (`apps/miniapp/`) built by mxjxn that provides a user-friendly interface for interacting with NFT liquidity pools built on the LSSVM protocol.
 
 ### Features
 
@@ -125,7 +143,7 @@ pnpm dev
 
 For detailed setup instructions, deployment guide, and architecture information, see the [Miniapp README](./apps/miniapp/README.md).
 
-## Building/Testing Contracts
+## Building/Testing Contracts (sudoswap)
 
 The Solidity contracts are located in `packages/lssvm-contracts/`.
 
@@ -149,7 +167,9 @@ To pull quote information, check out the sudo-defined-quoter package [here](http
 
 To view audits for sudoAMM v2 by Narya, Spearbit, and Cyfrin check out [here](https://github.com/sudoswap/v2-audits)
 
-## Deployment Scripts
+## Deployment Scripts (mxjxn)
+
+> **⚠️ Warning**: These deployment scripts are untested and provided as-is. Use at your own risk. Always test deployments on a testnet before deploying to mainnet. Verify all contract addresses and parameters before broadcasting transactions.
 
 This repository includes comprehensive deployment scripts for deploying the entire sudoAMM v2 protocol. The scripts are located in `packages/lssvm-contracts/script/` and include:
 
@@ -171,7 +191,7 @@ cp script/.env.example .env
 forge script script/DeployAll.s.sol:DeployAll --rpc-url $RPC_URL --broadcast --verify
 ```
 
-## Deployments
+## Deployments (sudoswap)
 
 The contracts have been deployed on Ethereum Mainnet to the following addresses:
 
