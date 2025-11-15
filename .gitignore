@@ -12,7 +12,23 @@ docs/
 
 # Dotenv file
 .env
+.env*.local
 
 .DS_Store
 
 __pycache__/
+
+# Turborepo
+.turbo
+
+# Node
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+dist/
+
+# Build outputs
+*.log

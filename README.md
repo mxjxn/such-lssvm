@@ -4,6 +4,30 @@ sudoAMM v2 is focused on delivering several specific feature upgrades missing fr
 
 Read the longform overview [here](https://blog.sudoswap.xyz/introducing-sudoswap-v2.html).
 
+## Monorepo Structure
+
+This repository is organized as a [Turborepo](https://turbo.build/repo) monorepo with the following structure:
+
+- **`apps/miniapp`** - Farcaster miniapp for interacting with NFT liquidity pools
+- **`packages/lssvm-contracts`** - Solidity contracts for the LSSVM protocol
+
+### Getting Started
+
+1. Install dependencies:
+```bash
+pnpm install
+```
+
+2. Build all packages:
+```bash
+pnpm build
+```
+
+3. Run development servers:
+```bash
+pnpm dev
+```
+
 ## Architecture
 ![sudoAMM v2 diagram](./flowchart.png)
 
@@ -54,7 +78,7 @@ Pools can now also be made for ERC1155<>ETH or ERC1155<>ERC20 pairs. Pools for E
 
 ## Miniapp
 
-This repository includes a **Farcaster miniapp** (`miniapp/`) that provides a user-friendly interface for interacting with NFT liquidity pools built on the LSSVM protocol.
+This repository includes a **Farcaster miniapp** (`apps/miniapp/`) that provides a user-friendly interface for interacting with NFT liquidity pools built on the LSSVM protocol.
 
 ### Features
 
@@ -76,40 +100,44 @@ This repository includes a **Farcaster miniapp** (`miniapp/`) that provides a us
 
 ### Quick Start
 
-1. Navigate to the miniapp directory:
+1. Install dependencies (from root):
 ```bash
-cd miniapp
+pnpm install
 ```
 
-2. Install dependencies:
+2. Configure environment variables (see `apps/miniapp/ENV_VARS.md` for details):
 ```bash
-npm install
-```
-
-3. Configure environment variables (see `miniapp/ENV_VARS.md` for details):
-```bash
-# Create .env.local with your contract addresses
+# Create apps/miniapp/.env.local with your contract addresses
 NEXT_PUBLIC_ROUTER_ADDRESS_8453=0x...
 NEXT_PUBLIC_FACTORY_ADDRESS_8453=0x...
 NEXT_PUBLIC_BASE_RPC_URL=https://base-mainnet.g.alchemy.com/v2/YOUR_API_KEY
 ```
 
-4. Run the development server:
+3. Run the development server:
 ```bash
-npm run dev
+# From root
+pnpm dev
+
+# Or from the miniapp directory
+cd apps/miniapp
+pnpm dev
 ```
 
-For detailed setup instructions, deployment guide, and architecture information, see the [Miniapp README](./miniapp/README.md).
+For detailed setup instructions, deployment guide, and architecture information, see the [Miniapp README](./apps/miniapp/README.md).
 
-## Building/Testing
+## Building/Testing Contracts
 
-```
+The Solidity contracts are located in `packages/lssvm-contracts/`.
+
+```bash
+cd packages/lssvm-contracts
 forge install
 forge test
 ```
 
 To generate coverage report locally: 
-```
+```bash
+cd packages/lssvm-contracts
 forge coverage --report lcov && genhtml lcov.info -o report --branch
 open report/index.html
 ```
@@ -123,16 +151,18 @@ To view audits for sudoAMM v2 by Narya, Spearbit, and Cyfrin check out [here](ht
 
 ## Deployment Scripts
 
-This repository includes comprehensive deployment scripts for deploying the entire sudoAMM v2 protocol. The scripts are located in the `script/` directory and include:
+This repository includes comprehensive deployment scripts for deploying the entire sudoAMM v2 protocol. The scripts are located in `packages/lssvm-contracts/script/` and include:
 
 - **Individual deployment scripts** for each component (Core, Bonding Curves, Router, Property Checkers, Settings)
 - **Master deployment script** (`DeployAll.s.sol`) for deploying everything at once
 - **Comprehensive documentation** including README, deployment checklist, and order reference
 
-For detailed instructions, see the [Deployment Guide](./script/README.md).
+For detailed instructions, see the [Deployment Guide](./packages/lssvm-contracts/script/README.md).
 
 Quick start:
 ```bash
+cd packages/lssvm-contracts
+
 # Configure your environment
 cp script/.env.example .env
 # Edit .env with your values

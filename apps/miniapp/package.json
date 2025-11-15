@@ -1,12 +1,13 @@
 {
-  "name": "nft-lp-miniapp",
+  "name": "@lssvm/miniapp",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@farcaster/miniapp-sdk": "^0.2.1",
