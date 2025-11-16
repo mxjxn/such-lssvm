@@ -32,3 +32,6 @@ dist/
 
 # Build outputs
 *.log
+
+# Temporary Huff compilation files
+**/__TEMP__*.huff
