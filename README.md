@@ -1,5 +1,7 @@
 # LSSVM Development Suite
 
+> **📖 Documentation Site**: View the complete documentation at [https://mxjxn.github.io/such-lssvm/](https://mxjxn.github.io/such-lssvm/) - A comprehensive, human-readable guide to all aspects of the LSSVM development suite.
+
 > **Note**: This repository is a Turborepo monorepo containing a comprehensive suite of tools and applications built around the LSSVM (Liquidity-Sensitive Single-Variant Market) protocol. It includes the protocol contracts from [sudoswap](https://github.com/sudoswap), reorganized and extended with a Farcaster miniapp, Graph Protocol subgraph, deployment scripts, and developer tooling by [mxjxn](https://github.com/mxjxn).
 
 ## Attribution
@@ -12,6 +14,7 @@
 ### From mxjxn
 - **`apps/miniapp/`** - Farcaster miniapp for interacting with NFT liquidity pools
 - **`apps/indexer/`** - Graph Protocol subgraph for indexing pool events and swaps
+- **`apps/docs/`** - Documentation website for GitHub Pages
 - Deployment scripts
 - Monorepo structure and Turborepo configuration
 - Integration tooling and developer experience improvements
@@ -28,6 +31,7 @@ This repository is organized as a [Turborepo](https://turbo.build/repo) monorepo
 
 - **`apps/miniapp`** - Farcaster miniapp for interacting with NFT liquidity pools (by mxjxn)
 - **`apps/indexer`** - Graph Protocol subgraph for indexing pool creation and swap events (by mxjxn)
+- **`apps/docs`** - Documentation website deployed to GitHub Pages (by mxjxn)
 - **`packages/lssvm-contracts`** - Solidity contracts for the LSSVM protocol (from sudoswap)
 
 ### Getting Started
