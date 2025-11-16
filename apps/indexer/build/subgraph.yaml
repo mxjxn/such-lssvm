@@ -1,0 +1,80 @@
+specVersion: 0.0.5
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum
+    name: LSSVMPairFactory
+    network: base-sepolia
+    source:
+      address: "0x372990Fd91CF61967325dD5270f50c4192bfb892"
+      abi: LSSVMPairFactory
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Pool
+      abis:
+        - name: LSSVMPairFactory
+          file: LSSVMPairFactory/LSSVMPairFactory.json
+        - name: LSSVMPair
+          file: LSSVMPairFactory/LSSVMPair.json
+      eventHandlers:
+        - event: NewERC721Pair(indexed address,uint256[])
+          handler: handleNewERC721Pair
+        - event: NewERC1155Pair(indexed address,uint256)
+          handler: handleNewERC1155Pair
+        - event: ERC20Deposit(indexed address,uint256)
+          handler: handleERC20Deposit
+        - event: NFTDeposit(indexed address,uint256[])
+          handler: handleNFTDeposit
+        - event: ERC1155Deposit(indexed address,indexed uint256,uint256)
+          handler: handleERC1155Deposit
+      file: LSSVMPairFactory/LSSVMPairFactory.wasm
+templates:
+  - name: LSSVMPair
+    kind: ethereum
+    network: base-sepolia
+    source:
+      abi: LSSVMPair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Pool
+        - Swap
+        - Deposit
+        - Withdrawal
+      abis:
+        - name: LSSVMPair
+          file: LSSVMPair/LSSVMPair.json
+        - name: LSSVMPairFactory
+          file: LSSVMPair/LSSVMPairFactory.json
+      eventHandlers:
+        - event: SwapNFTInPair(uint256,uint256[])
+          handler: handleSwapNFTInPair
+        - event: SwapNFTInPair(uint256,uint256)
+          handler: handleSwapNFTInPairAmount
+        - event: SwapNFTOutPair(uint256,uint256[])
+          handler: handleSwapNFTOutPair
+        - event: SwapNFTOutPair(uint256,uint256)
+          handler: handleSwapNFTOutPairAmount
+        - event: SpotPriceUpdate(uint128)
+          handler: handleSpotPriceUpdate
+        - event: TokenDeposit(uint256)
+          handler: handleTokenDeposit
+        - event: TokenWithdrawal(uint256)
+          handler: handleTokenWithdrawal
+        - event: NFTWithdrawal(uint256[])
+          handler: handleNFTWithdrawal
+        - event: NFTWithdrawal(uint256)
+          handler: handleNFTWithdrawalAmount
+        - event: DeltaUpdate(uint128)
+          handler: handleDeltaUpdate
+        - event: FeeUpdate(uint96)
+          handler: handleFeeUpdate
+        - event: AssetRecipientChange(indexed address)
+          handler: handleAssetRecipientChange
+      file: templates/LSSVMPair/LSSVMPair.wasm

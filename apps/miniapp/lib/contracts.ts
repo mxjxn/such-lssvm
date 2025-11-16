@@ -9,6 +9,8 @@ export function getRouterAddress(chainId: number): Address {
   
   if (chainId === 8453) {
     address = CONFIG.ROUTER_ADDRESS_8453 as Address | undefined
+  } else if (chainId === 84532) {
+    address = CONFIG.ROUTER_ADDRESS_84532 as Address | undefined
   }
   
   // Fallback to direct env access (for other chains or if config didn't work)
@@ -21,7 +23,7 @@ export function getRouterAddress(chainId: number): Address {
   if (typeof window !== 'undefined') {
     console.log('=== Router Address Debug ===')
     console.log('Chain ID:', chainId)
-    console.log('Address from CONFIG:', chainId === 8453 ? CONFIG.ROUTER_ADDRESS_8453 : 'N/A')
+    console.log('Address from CONFIG:', chainId === 8453 ? CONFIG.ROUTER_ADDRESS_8453 : chainId === 84532 ? CONFIG.ROUTER_ADDRESS_84532 : 'N/A')
     console.log('Address from env:', process.env[`NEXT_PUBLIC_ROUTER_ADDRESS_${chainId}`])
     console.log('Final address:', address)
     console.log('===========================')
@@ -39,6 +41,8 @@ export function getFactoryAddress(chainId: number): Address {
   
   if (chainId === 8453) {
     address = CONFIG.FACTORY_ADDRESS_8453 as Address | undefined
+  } else if (chainId === 84532) {
+    address = CONFIG.FACTORY_ADDRESS_84532 as Address | undefined
   }
   
   // Fallback to direct env access
@@ -411,7 +415,7 @@ export const ERC1155_ABI = [
   {
     inputs: [
       { internalType: 'address', name: 'account', type: 'address' },
-      { internalType: 'uint256', name: 'id', type: 'uint256' },
+      { internalType: 'address', name: 'operator', type: 'address' },
     ],
     name: 'isApprovedForAll',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
@@ -482,7 +486,7 @@ export const ERC20_ABI = [
   },
 ] as const
 
-// LSSVMPairFactory ABI (minimal - just what we need)
+// LSSVMPairFactory ABI
 export const LSSVM_FACTORY_ABI = [
   {
     inputs: [{ internalType: 'address', name: 'router', type: 'address' }],
@@ -499,6 +503,92 @@ export const LSSVM_FACTORY_ABI = [
     name: 'getPairNFTType',
     outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
     stateMutability: 'pure',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'contract IERC721', name: '_nft', type: 'address' },
+      { internalType: 'contract ICurve', name: '_bondingCurve', type: 'address' },
+      { internalType: 'address payable', name: '_assetRecipient', type: 'address' },
+      { internalType: 'uint8', name: '_poolType', type: 'uint8' },
+      { internalType: 'uint128', name: '_delta', type: 'uint128' },
+      { internalType: 'uint96', name: '_fee', type: 'uint96' },
+      { internalType: 'uint128', name: '_spotPrice', type: 'uint128' },
+      { internalType: 'address', name: '_propertyChecker', type: 'address' },
+      { internalType: 'uint256[]', name: '_initialNFTIDs', type: 'uint256[]' },
+    ],
+    name: 'createPairERC721ETH',
+    outputs: [{ internalType: 'contract LSSVMPairERC721ETH', name: 'pair', type: 'address' }],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        components: [
+          { internalType: 'contract ERC20', name: 'token', type: 'address' },
+          { internalType: 'contract IERC721', name: 'nft', type: 'address' },
+          { internalType: 'contract ICurve', name: 'bondingCurve', type: 'address' },
+          { internalType: 'address payable', name: 'assetRecipient', type: 'address' },
+          { internalType: 'uint8', name: 'poolType', type: 'uint8' },
+          { internalType: 'uint128', name: 'delta', type: 'uint128' },
+          { internalType: 'uint96', name: 'fee', type: 'uint96' },
+          { internalType: 'uint128', name: 'spotPrice', type: 'uint128' },
+          { internalType: 'address', name: 'propertyChecker', type: 'address' },
+          { internalType: 'uint256[]', name: 'initialNFTIDs', type: 'uint256[]' },
+          { internalType: 'uint256', name: 'initialTokenBalance', type: 'uint256' },
+        ],
+        internalType: 'struct LSSVMPairFactory.CreateERC721ERC20PairParams',
+        name: 'params',
+        type: 'tuple',
+      },
+    ],
+    name: 'createPairERC721ERC20',
+    outputs: [{ internalType: 'contract LSSVMPairERC721ERC20', name: 'pair', type: 'address' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'contract IERC1155', name: '_nft', type: 'address' },
+      { internalType: 'contract ICurve', name: '_bondingCurve', type: 'address' },
+      { internalType: 'address payable', name: '_assetRecipient', type: 'address' },
+      { internalType: 'uint8', name: '_poolType', type: 'uint8' },
+      { internalType: 'uint128', name: '_delta', type: 'uint128' },
+      { internalType: 'uint96', name: '_fee', type: 'uint96' },
+      { internalType: 'uint128', name: '_spotPrice', type: 'uint128' },
+      { internalType: 'uint256', name: '_nftId', type: 'uint256' },
+      { internalType: 'uint256', name: '_initialNFTBalance', type: 'uint256' },
+    ],
+    name: 'createPairERC1155ETH',
+    outputs: [{ internalType: 'contract LSSVMPairERC1155ETH', name: 'pair', type: 'address' }],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        components: [
+          { internalType: 'contract ERC20', name: 'token', type: 'address' },
+          { internalType: 'contract IERC1155', name: 'nft', type: 'address' },
+          { internalType: 'contract ICurve', name: 'bondingCurve', type: 'address' },
+          { internalType: 'address payable', name: 'assetRecipient', type: 'address' },
+          { internalType: 'uint8', name: 'poolType', type: 'uint8' },
+          { internalType: 'uint128', name: 'delta', type: 'uint128' },
+          { internalType: 'uint96', name: 'fee', type: 'uint96' },
+          { internalType: 'uint128', name: 'spotPrice', type: 'uint128' },
+          { internalType: 'uint256', name: 'nftId', type: 'uint256' },
+          { internalType: 'uint256', name: 'initialNFTBalance', type: 'uint256' },
+          { internalType: 'uint256', name: 'initialTokenBalance', type: 'uint256' },
+        ],
+        internalType: 'struct LSSVMPairFactory.CreateERC1155ERC20PairParams',
+        name: 'params',
+        type: 'tuple',
+      },
+    ],
+    name: 'createPairERC1155ERC20',
+    outputs: [{ internalType: 'contract LSSVMPairERC1155ERC20', name: 'pair', type: 'address' }],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   // Events for pool discovery
@@ -520,7 +610,64 @@ export const LSSVM_FACTORY_ABI = [
     name: 'NewERC1155Pair',
     type: 'event',
   },
+  // Error definitions for better error messages
+  {
+    inputs: [],
+    name: 'LSSVMPairFactory__BondingCurveNotWhitelisted',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'LSSVMPairFactory__ReentrantCall',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'LSSVMPairFactory__ZeroAddress',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'LSSVMPair__InvalidDelta',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'LSSVMPair__InvalidSpotPrice',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'LSSVMPair__NftNotTransferred',
+    type: 'error',
+  },
 ] as const
+
+// Bonding curve addresses by chain
+export const BONDING_CURVES = {
+  8453: {
+    // Base Mainnet
+    LINEAR: '0xe41352CB8D9af18231E05520751840559C2a548A' as Address,
+    EXPONENTIAL: '0x9506C0E5CEe9AD1dEe65B3539268D61CCB25aFB6' as Address,
+    XYK: '0xd0A2f4ae5E816ec09374c67F6532063B60dE037B' as Address,
+    GDA: '0x4f1627be4C72aEB9565D4c751550C4D262a96B51' as Address,
+  },
+  84532: {
+    // Base Sepolia Testnet
+    LINEAR: '0x3F1E31d662eD24b6B69d73B07C98076d3814F8C0' as Address,
+    EXPONENTIAL: '0x4637d06530d5D375B1D5dE1117C98b0c6EA7eDd1' as Address,
+    XYK: '0xC4DfB54Ca18c9e5EC2a23e8DE09588982A6b2242' as Address,
+    GDA: '0x60bAB2734eb85F07Ca93E3B7Fb1015fcc5e9CbA7' as Address,
+  },
+} as const
+
+export function getBondingCurveAddress(chainId: number, curveType: 'LINEAR' | 'EXPONENTIAL' | 'XYK' | 'GDA'): Address {
+  const curves = BONDING_CURVES[chainId as keyof typeof BONDING_CURVES]
+  if (!curves) {
+    throw new Error(`Bonding curves not configured for chain ${chainId}`)
+  }
+  return curves[curveType]
+}
 
 // Types
 export interface PairSwapSpecific {

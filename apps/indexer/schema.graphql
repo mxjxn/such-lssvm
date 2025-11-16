@@ -1,0 +1,69 @@
+type Pool @entity(immutable: false) {
+  id: ID!                    # Pool address
+  nftContract: Bytes!        # NFT contract address
+  tokenContract: Bytes       # ERC20 token (null for ETH pools)
+  poolType: Int!             # 0=TOKEN, 1=NFT, 2=TRADE
+  poolVariant: Int!          # 0=ERC721_ETH, 1=ERC721_ERC20, 2=ERC1155_ETH, 3=ERC1155_ERC20
+  spotPrice: BigInt!
+  delta: BigInt!
+  fee: BigInt!
+  bondingCurve: Bytes!
+  assetRecipient: Bytes
+  owner: Bytes!
+  createdAt: BigInt!
+  createdAtBlock: BigInt!
+  createdAtTx: Bytes!
+  
+  # Relationships
+  swaps: [Swap!]! @derivedFrom(field: "pool")
+  deposits: [Deposit!]! @derivedFrom(field: "pool")
+  withdrawals: [Withdrawal!]! @derivedFrom(field: "pool")
+  
+  # For ERC1155 pools
+  nftId: BigInt               # ERC1155 token ID (null for ERC721)
+  
+  # Current state
+  currentTokenBalance: BigInt
+  currentNFTBalance: BigInt
+}
+
+type Swap @entity(immutable: true) {
+  id: ID!                    # tx hash + log index
+  pool: Pool!
+  type: String!              # "buy" or "sell"
+  nftIds: [BigInt!]!         # For ERC721 (array of IDs)
+  nftAmount: BigInt          # For ERC1155 (quantity)
+  tokenAmount: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+  from: Bytes!               # User who initiated the swap
+}
+
+type Deposit @entity(immutable: true) {
+  id: ID!                    # tx hash + log index
+  pool: Pool!
+  type: String!               # "nft", "token", or "erc1155"
+  nftIds: [BigInt!]!          # For ERC721 deposits
+  nftId: BigInt               # For ERC1155 deposits
+  nftAmount: BigInt           # For ERC1155 deposits
+  tokenAmount: BigInt         # For token deposits
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+  from: Bytes!                # User who deposited
+}
+
+type Withdrawal @entity(immutable: true) {
+  id: ID!                    # tx hash + log index
+  pool: Pool!
+  type: String!               # "nft" or "token"
+  nftIds: [BigInt!]!          # For ERC721 withdrawals
+  nftAmount: BigInt           # For ERC1155 withdrawals
+  tokenAmount: BigInt         # For token withdrawals
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+  to: Bytes!                  # User who withdrew
+}
+

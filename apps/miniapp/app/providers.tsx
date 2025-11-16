@@ -2,22 +2,21 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider, createConfig, http } from 'wagmi'
-import { base } from 'wagmi/chains'
+import { base, baseSepolia } from 'wagmi/chains'
 import { useState, useEffect } from 'react'
 import { farcasterFrame } from '@farcaster/miniapp-wagmi-connector'
 import { CartProvider } from '@/contexts/CartContext'
+import { CONFIG } from '@/lib/config'
 
 const queryClient = new QueryClient()
 
-// Get RPC URL from environment or use default
-const BASE_RPC_URL = process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org'
-
 // Create wagmi config with Farcaster miniapp connector
-// Currently only supporting Base Mainnet
+// Supporting Base Mainnet and Base Sepolia
 export const config = createConfig({
-  chains: [base],
+  chains: [base, baseSepolia],
   transports: {
-    [base.id]: http(BASE_RPC_URL),
+    [base.id]: http(CONFIG.BASE_RPC_URL),
+    [baseSepolia.id]: http(CONFIG.BASE_SEPOLIA_RPC_URL),
   },
   connectors: [
     farcasterFrame(),

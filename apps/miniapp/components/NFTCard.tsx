@@ -1,21 +1,68 @@
 'use client'
 
 import { useState } from 'react'
-import { NFTMetadata } from '@/lib/metadata'
+import { useQuery } from '@tanstack/react-query'
+import { NFTMetadata, fetchERC721Metadata, fetchERC1155Metadata } from '@/lib/metadata'
 import { Address } from 'viem'
 import { useCart } from '@/hooks/useCart'
 import { QuantitySelector } from './QuantitySelector'
+import { formatPrice } from '@/lib/pool'
+import Link from 'next/link'
 
 interface NFTCardProps {
   tokenId: bigint
-  metadata: NFTMetadata | null
+  nftContract: Address
+  poolAddress: Address
+  poolType: number
+  poolVariant: number
+  price: bigint
+  chainId: number
+  amount?: bigint | null // For ERC1155
+  metadata?: NFTMetadata | null
   isLoading?: boolean
-  poolAddress?: Address
-  chainId?: number
   onAddToCart?: () => void
 }
 
-export function NFTCard({ tokenId, metadata, isLoading, poolAddress, chainId, onAddToCart }: NFTCardProps) {
+function getPoolTypeLabel(poolType: number): string {
+  return poolType === 0 ? 'TOKEN' : poolType === 1 ? 'NFT' : 'TRADE'
+}
+
+function getPoolVariantLabel(poolVariant: number): string {
+  const labels = ['ERC721/ETH', 'ERC721/ERC20', 'ERC1155/ETH', 'ERC1155/ERC20']
+  return labels[poolVariant] || 'Unknown'
+}
+
+export default function NFTCard({ 
+  tokenId, 
+  nftContract,
+  poolAddress, 
+  poolType,
+  poolVariant,
+  price,
+  chainId,
+  amount,
+  metadata: providedMetadata,
+  isLoading: providedIsLoading,
+  onAddToCart 
+}: NFTCardProps) {
+  const isERC1155 = poolVariant === 2 || poolVariant === 3
+
+  // Fetch metadata if not provided
+  const { data: fetchedMetadata, isLoading: metadataLoading } = useQuery({
+    queryKey: ['nftMetadata', nftContract, tokenId.toString(), chainId, isERC1155],
+    queryFn: async () => {
+      if (isERC1155) {
+        return await fetchERC1155Metadata(nftContract, tokenId, chainId)
+      } else {
+        return await fetchERC721Metadata(nftContract, tokenId, chainId)
+      }
+    },
+    enabled: !providedMetadata,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+
+  const metadata = providedMetadata || fetchedMetadata || null
+  const isLoading = providedIsLoading || metadataLoading
   const imageUrl = metadata?.image || '/placeholder-nft.png'
   const hasImageUrl = imageUrl && imageUrl !== '/placeholder-nft.png'
   const [imageLoading, setImageLoading] = useState(hasImageUrl)
@@ -53,67 +100,103 @@ export function NFTCard({ tokenId, metadata, isLoading, poolAddress, chainId, on
   const hasImage = hasImageUrl && !imageError
 
   return (
-    <div 
-      className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="aspect-square bg-gray-100 rounded-lg mb-3 overflow-hidden relative">
-        {hasImage ? (
-          <>
-            {imageLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-blue-600"></div>
-              </div>
-            )}
-            <img
-              src={imageUrl}
-              alt={name}
-              className={`w-full h-full object-cover ${imageLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-200`}
-              onLoad={() => setImageLoading(false)}
-              onError={(e) => {
-                setImageError(true)
-                setImageLoading(false)
-                const target = e.target as HTMLImageElement
-                target.src = '/placeholder-nft.png'
-              }}
-            />
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
-            <svg
-              className="w-12 h-12"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+    <Link href={`/pool/${chainId}/${poolAddress}`}>
+      <div 
+        className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative cursor-pointer"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Pool type badge */}
+        <div className="absolute top-2 right-2 z-10 flex gap-1">
+          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded font-semibold">
+            {getPoolTypeLabel(poolType)}
+          </span>
+          <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded font-semibold">
+            {getPoolVariantLabel(poolVariant)}
+          </span>
+        </div>
+
+        <div className="aspect-square bg-gray-100 rounded-lg mb-3 overflow-hidden relative">
+          {hasImage ? (
+            <>
+              {imageLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-blue-600"></div>
+                </div>
+              )}
+              <img
+                src={imageUrl}
+                alt={name}
+                className={`w-full h-full object-cover ${imageLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-200`}
+                onLoad={() => setImageLoading(false)}
+                onError={(e) => {
+                  setImageError(true)
+                  setImageLoading(false)
+                  const target = e.target as HTMLImageElement
+                  target.src = '/placeholder-nft.png'
+                }}
               />
-            </svg>
+            </>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-400">
+              <svg
+                className="w-12 h-12"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+          )}
+        </div>
+        
+        {/* Price and pool info */}
+        <div className="mb-2">
+          <div className="text-lg font-bold text-gray-900">
+            {formatPrice(price)} {poolVariant === 1 || poolVariant === 3 ? 'Tokens' : 'ETH'}
+          </div>
+          {amount !== null && amount !== undefined && (
+            <div className="text-xs text-gray-500 mt-1">
+              Available: {amount.toString()}
+            </div>
+          )}
+        </div>
+
+        <div className="font-semibold text-gray-900 text-sm mb-1 truncate">{name}</div>
+        {description && (
+          <div className="text-xs text-gray-500 line-clamp-2 mb-1">{description}</div>
+        )}
+        <div className="text-xs text-gray-400 font-mono mb-2">#{tokenId.toString()}</div>
+        
+        {/* Pool address */}
+        <div className="text-xs text-gray-400 font-mono truncate">
+          Pool: {poolAddress.slice(0, 6)}...{poolAddress.slice(-4)}
+        </div>
+
+        {/* Add to cart overlay */}
+        {isHovered && (
+          <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center transition-opacity duration-200">
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleAddToCart()
+              }}
+              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-semibold shadow-lg transition-colors"
+            >
+              Add to Cart
+            </button>
           </div>
         )}
       </div>
-      {poolAddress && chainId !== undefined && (
-        <div className={`absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <button
-            onClick={handleAddToCart}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-semibold shadow-lg transition-colors"
-          >
-            Add to Cart
-          </button>
-        </div>
-      )}
-      <div className="font-semibold text-gray-900 text-sm mb-1 truncate">{name}</div>
-      {description && (
-        <div className="text-xs text-gray-500 line-clamp-2 mb-1">{description}</div>
-      )}
-      <div className="text-xs text-gray-400 font-mono">#{tokenId.toString()}</div>
-    </div>
+    </Link>
   )
 }
 
