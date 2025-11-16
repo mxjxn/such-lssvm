@@ -17,32 +17,46 @@ import "../src/ILSSVMPairFactoryLike.sol";
 import "../src/LSSVMRouter.sol";
 import "../src/bonding-curves/ICurve.sol";
 
+// Bonding curves
+import "../src/bonding-curves/LinearCurve.sol";
+import "../src/bonding-curves/ExponentialCurve.sol";
+import "../src/bonding-curves/XykCurve.sol";
+import "../src/bonding-curves/GDACurve.sol";
+
 /**
- * @title Base Mainnet Deployment Script (Reusing Sudoswap Bonding Curves)
- * @notice Deploys factory and router contracts, reusing stateless bonding curves from sudoswap
+ * @title Base Testnet (Sepolia) Deployment Script
+ * @notice Deploys factory, router, and bonding curve contracts to Base Sepolia testnet
  * @dev This script deploys:
- *      1. RoyaltyEngine
- *      2. Pair Templates (ERC721ETH, ERC721ERC20, ERC1155ETH, ERC1155ERC20)
- *      3. LSSVMPairFactory
- *      4. VeryFastRouter
+ *      1. Bonding Curves (LinearCurve, ExponentialCurve, XykCurve, GDACurve)
+ *      2. RoyaltyEngine
+ *      3. Pair Templates (ERC721ETH, ERC721ERC20, ERC1155ETH, ERC1155ERC20)
+ *      4. LSSVMPairFactory
+ *      5. VeryFastRouter
  * 
- *      It then whitelists sudoswap's bonding curves (deployed on Base Mainnet):
- *      - LinearCurve: 0xe41352CB8D9af18231E05520751840559C2a548A
- *      - ExponentialCurve: 0x9506C0E5CEe9AD1dEe65B3539268D61CCB25aFB6
- *      - XYKCurve: 0xd0A2f4ae5E816ec09374c67F6532063B60dE037B
- *      - GDACurve: 0x4f1627be4C72aEB9565D4c751550C4D262a96B51
+ *      It then whitelists all bonding curves and the router in the factory.
  * 
  * Required environment variables:
- *      - ROYALTY_REGISTRY: Address of the Manifold Royalty Registry for Base
+ *      - ROYALTY_REGISTRY: Address of the Manifold Royalty Registry for Base Sepolia
  *      - PROTOCOL_FEE_RECIPIENT: Address to receive protocol fees
  *      - PROTOCOL_FEE_MULTIPLIER: Protocol fee multiplier (in base 1e18, max 0.1e18 = 10%)
  *      - FACTORY_OWNER: Address that will own the factory contract
  * 
+ * Optional environment variables:
+ *      - DEPLOY_BONDING_CURVES: Set to "true" to deploy bonding curves (default: true)
+ *      - LINEAR_CURVE_ADDRESS: Use existing LinearCurve address (if DEPLOY_BONDING_CURVES=false)
+ *      - EXPONENTIAL_CURVE_ADDRESS: Use existing ExponentialCurve address
+ *      - XYK_CURVE_ADDRESS: Use existing XykCurve address
+ *      - GDA_CURVE_ADDRESS: Use existing GDACurve address
+ * 
  * Usage:
- *      forge script script/DeployForBase.s.sol:DeployForBase --rpc-url $RPC_URL --broadcast --verify
+ *      forge script script/DeployForBaseTestnet.s.sol:DeployForBaseTestnet --rpc-url $RPC_URL --broadcast --verify
  */
-contract DeployForBase is Script {
+contract DeployForBaseTestnet is Script {
     // Deployment state
+    LinearCurve public linearCurve;
+    ExponentialCurve public exponentialCurve;
+    XykCurve public xykCurve;
+    GDACurve public gdaCurve;
     RoyaltyEngine public royaltyEngine;
     LSSVMPairERC721ETH public erc721ETHTemplate;
     LSSVMPairERC721ERC20 public erc721ERC20Template;
@@ -50,12 +64,6 @@ contract DeployForBase is Script {
     LSSVMPairERC1155ERC20 public erc1155ERC20Template;
     LSSVMPairFactory public factory;
     VeryFastRouter public router;
-
-    // Sudoswap bonding curve addresses (Base Mainnet)
-    address constant LINEAR_CURVE = 0xe41352CB8D9af18231E05520751840559C2a548A;
-    address constant EXPONENTIAL_CURVE = 0x9506C0E5CEe9AD1dEe65B3539268D61CCB25aFB6;
-    address constant XYK_CURVE = 0xd0A2f4ae5E816ec09374c67F6532063B60dE037B;
-    address constant GDA_CURVE = 0x4f1627be4C72aEB9565D4c751550C4D262a96B51;
 
     function run() external {
         // Load configuration from environment variables
@@ -66,22 +74,66 @@ contract DeployForBase is Script {
 
         vm.startBroadcast();
 
-        // ===== STEP 1: Deploy Core Contracts =====
-        console.log("=== STEP 1: Deploying Core Contracts ===");
+        // ===== STEP 1: Deploy Bonding Curves =====
+        console.log("=== STEP 1: Deploying Bonding Curves ===");
+        deployBondingCurves();
+
+        // ===== STEP 2: Deploy Core Contracts =====
+        console.log("\n=== STEP 2: Deploying Core Contracts ===");
         deployCore(royaltyRegistry, protocolFeeRecipient, protocolFeeMultiplier, factoryOwner);
 
-        // ===== STEP 2: Deploy Router =====
-        console.log("\n=== STEP 2: Deploying Router ===");
+        // ===== STEP 3: Deploy Router =====
+        console.log("\n=== STEP 3: Deploying Router ===");
         deployRouter();
 
-        // ===== STEP 3: Configure Factory =====
-        console.log("\n=== STEP 3: Configuring Factory ===");
+        // ===== STEP 4: Configure Factory =====
+        console.log("\n=== STEP 4: Configuring Factory ===");
         configureFactory();
 
         vm.stopBroadcast();
 
         // Print deployment summary
         printSummary();
+    }
+
+    function deployBondingCurves() internal {
+        // Check if we should deploy bonding curves or use existing addresses
+        bool deployCurves = true;
+        try vm.envBool("DEPLOY_BONDING_CURVES") returns (bool val) {
+            deployCurves = val;
+        } catch {}
+
+        if (deployCurves) {
+            console.log("Deploying new bonding curves...");
+            linearCurve = new LinearCurve();
+            console.log("LinearCurve:", address(linearCurve));
+            
+            exponentialCurve = new ExponentialCurve();
+            console.log("ExponentialCurve:", address(exponentialCurve));
+            
+            xykCurve = new XykCurve();
+            console.log("XykCurve:", address(xykCurve));
+            
+            gdaCurve = new GDACurve();
+            console.log("GDACurve:", address(gdaCurve));
+        } else {
+            console.log("Using existing bonding curve addresses...");
+            address linearCurveAddr = vm.envAddress("LINEAR_CURVE_ADDRESS");
+            address exponentialCurveAddr = vm.envAddress("EXPONENTIAL_CURVE_ADDRESS");
+            address xykCurveAddr = vm.envAddress("XYK_CURVE_ADDRESS");
+            address gdaCurveAddr = vm.envAddress("GDA_CURVE_ADDRESS");
+            
+            // Cast to contract types (we won't use them directly, just store addresses)
+            linearCurve = LinearCurve(linearCurveAddr);
+            exponentialCurve = ExponentialCurve(exponentialCurveAddr);
+            xykCurve = XykCurve(xykCurveAddr);
+            gdaCurve = GDACurve(gdaCurveAddr);
+            
+            console.log("LinearCurve:", address(linearCurve));
+            console.log("ExponentialCurve:", address(exponentialCurve));
+            console.log("XykCurve:", address(xykCurve));
+            console.log("GDACurve:", address(gdaCurve));
+        }
     }
 
     function deployCore(
@@ -131,25 +183,25 @@ contract DeployForBase is Script {
     function configureFactory() internal {
         // Check if deployer is the factory owner
         address factoryOwner = vm.envAddress("FACTORY_OWNER");
-        address deployer = tx.origin; // Use tx.origin for deployer address
+        address deployer = tx.origin;
         
         // Fallback: verify factory's actual owner matches expected owner
         address actualOwner = factory.owner();
         bool shouldConfigure = (deployer == factoryOwner) || (actualOwner == factoryOwner);
         
         if (shouldConfigure) {
-            console.log("Whitelisting sudoswap bonding curves...");
-            factory.setBondingCurveAllowed(ICurve(LINEAR_CURVE), true);
-            console.log("  LinearCurve whitelisted:", LINEAR_CURVE);
+            console.log("Whitelisting bonding curves...");
+            factory.setBondingCurveAllowed(ICurve(address(linearCurve)), true);
+            console.log("  LinearCurve whitelisted:", address(linearCurve));
             
-            factory.setBondingCurveAllowed(ICurve(EXPONENTIAL_CURVE), true);
-            console.log("  ExponentialCurve whitelisted:", EXPONENTIAL_CURVE);
+            factory.setBondingCurveAllowed(ICurve(address(exponentialCurve)), true);
+            console.log("  ExponentialCurve whitelisted:", address(exponentialCurve));
             
-            factory.setBondingCurveAllowed(ICurve(XYK_CURVE), true);
-            console.log("  XYKCurve whitelisted:", XYK_CURVE);
+            factory.setBondingCurveAllowed(ICurve(address(xykCurve)), true);
+            console.log("  XykCurve whitelisted:", address(xykCurve));
             
-            factory.setBondingCurveAllowed(ICurve(GDA_CURVE), true);
-            console.log("  GDACurve whitelisted:", GDA_CURVE);
+            factory.setBondingCurveAllowed(ICurve(address(gdaCurve)), true);
+            console.log("  GDACurve whitelisted:", address(gdaCurve));
             
             console.log("Whitelisting router...");
             factory.setRouterAllowed(LSSVMRouter(payable(address(router))), true);
@@ -162,10 +214,10 @@ contract DeployForBase is Script {
             console.log("  Factory Owner:", factoryOwner);
             console.log("  Actual Factory Owner:", actualOwner);
             console.log("\nManual configuration commands:");
-            console.log("  factory.setBondingCurveAllowed(0xe41352CB8D9af18231E05520751840559C2a548A, true)");
-            console.log("  factory.setBondingCurveAllowed(0x9506C0E5CEe9AD1dEe65B3539268D61CCB25aFB6, true)");
-            console.log("  factory.setBondingCurveAllowed(0xd0A2f4ae5E816ec09374c67F6532063B60dE037B, true)");
-            console.log("  factory.setBondingCurveAllowed(0x4f1627be4C72aEB9565D4c751550C4D262a96B51, true)");
+            console.log("  factory.setBondingCurveAllowed(", address(linearCurve), ", true)");
+            console.log("  factory.setBondingCurveAllowed(", address(exponentialCurve), ", true)");
+            console.log("  factory.setBondingCurveAllowed(", address(xykCurve), ", true)");
+            console.log("  factory.setBondingCurveAllowed(", address(gdaCurve), ", true)");
             console.log("  factory.setRouterAllowed(", address(router), ", true)");
         }
     }
@@ -173,8 +225,14 @@ contract DeployForBase is Script {
     function printSummary() internal view {
         console.log("\n");
         console.log("==========================================================");
-        console.log("            DEPLOYMENT SUMMARY (Base Mainnet)");
+        console.log("      DEPLOYMENT SUMMARY (Base Sepolia Testnet)");
         console.log("==========================================================");
+        console.log("");
+        console.log("Bonding Curves:");
+        console.log("  LinearCurve:             ", address(linearCurve));
+        console.log("  ExponentialCurve:        ", address(exponentialCurve));
+        console.log("  XykCurve:                ", address(xykCurve));
+        console.log("  GDACurve:                ", address(gdaCurve));
         console.log("");
         console.log("Core Contracts:");
         console.log("  RoyaltyEngine:           ", address(royaltyEngine));
@@ -187,18 +245,13 @@ contract DeployForBase is Script {
         console.log("Router:");
         console.log("  VeryFastRouter:          ", address(router));
         console.log("");
-        console.log("Bonding Curves (Base Mainnet):");
-        console.log("  LinearCurve:             ", LINEAR_CURVE);
-        console.log("  ExponentialCurve:        ", EXPONENTIAL_CURVE);
-        console.log("  XykCurve:                ", XYK_CURVE);
-        console.log("  GDACurve:                ", GDA_CURVE);
-        console.log("");
         console.log("==========================================================");
         console.log("\nNext Steps:");
         console.log("1. Update apps/miniapp/.env.local with:");
-        console.log("   NEXT_PUBLIC_FACTORY_ADDRESS_8453=", address(factory));
-        console.log("   NEXT_PUBLIC_ROUTER_ADDRESS_8453=", address(router));
-        console.log("2. Verify contracts on BaseScan if using --verify flag");
+        console.log("   NEXT_PUBLIC_FACTORY_ADDRESS_84532=", address(factory));
+        console.log("   NEXT_PUBLIC_ROUTER_ADDRESS_84532=", address(router));
+        console.log("2. Verify contracts on BaseScan Sepolia if using --verify flag");
+        console.log("3. Get testnet ETH from Base Sepolia faucet if needed");
         console.log("==========================================================");
     }
 }

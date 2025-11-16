@@ -66,5 +66,29 @@ anvil
 
 For comprehensive local testing instructions including ERC721 and ERC1155 pool testing, see [LOCAL_TESTING.md](./LOCAL_TESTING.md).
 
+### Base Testnet Deployment
+
+Deploy to Base Sepolia testnet:
+
+```bash
+# Set up .env.local with testnet configuration
+# Then deploy:
+./deploy-base-testnet.sh
+```
+
+See [DEPLOY_BASE_TESTNET.md](./DEPLOY_BASE_TESTNET.md) for detailed testnet deployment instructions.
+
+### Base Mainnet Deployment
+
+Deploy to Base mainnet:
+
+```bash
+# Set up .env.local with mainnet configuration
+# Then deploy:
+./deploy-base.sh
+```
+
+See [DEPLOY_BASE.md](./DEPLOY_BASE.md) for detailed mainnet deployment instructions.
+
 For details on deployment improvements and best practices, see [DEPLOYMENT_IMPROVEMENTS.md](./DEPLOYMENT_IMPROVEMENTS.md).
 

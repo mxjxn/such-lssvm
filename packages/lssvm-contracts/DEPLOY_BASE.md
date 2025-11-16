@@ -89,11 +89,11 @@ cast call $FACTORY_ADDRESS "protocolFeeRecipient()" --rpc-url $RPC_URL
 Verify bonding curves are whitelisted:
 
 ```bash
-# Sudoswap bonding curve addresses (Ethereum Mainnet - stateless, reused on Base)
-LINEAR_CURVE=0xe5d78fec1a7f42d2F3620238C498F088A866FdC5
-EXPONENTIAL_CURVE=0xfa056C602aD0C0C4EE4385b3233f2Cb06730334a
-XYK_CURVE=0xc7fB91B6cd3C67E02EC08013CEBb29b1241f3De5
-GDA_CURVE=0x1fD5876d4A3860Eb0159055a3b7Cb79fdFFf6B67
+# Sudoswap bonding curve addresses (Base Mainnet)
+LINEAR_CURVE=0xe41352CB8D9af18231E05520751840559C2a548A
+EXPONENTIAL_CURVE=0x9506C0E5CEe9AD1dEe65B3539268D61CCB25aFB6
+XYK_CURVE=0xd0A2f4ae5E816ec09374c67F6532063B60dE037B
+GDA_CURVE=0x4f1627be4C72aEB9565D4c751550C4D262a96B51
 
 cast call $FACTORY_ADDRESS "bondingCurveAllowed(address)" $LINEAR_CURVE --rpc-url $RPC_URL
 cast call $FACTORY_ADDRESS "bondingCurveAllowed(address)" $EXPONENTIAL_CURVE --rpc-url $RPC_URL
@@ -120,28 +120,28 @@ FACTORY_ADDRESS=0x...
 ROUTER_ADDRESS=0x...
 PRIVATE_KEY=your_private_key
 
-# Whitelist bonding curves
+# Whitelist bonding curves (Base Mainnet addresses)
 cast send $FACTORY_ADDRESS \
   "setBondingCurveAllowed(address,bool)" \
-  0xe5d78fec1a7f42d2F3620238C498F088A866FdC5 true \
+  0xe41352CB8D9af18231E05520751840559C2a548A true \
   --private-key $PRIVATE_KEY \
   --rpc-url $RPC_URL
 
 cast send $FACTORY_ADDRESS \
   "setBondingCurveAllowed(address,bool)" \
-  0xfa056C602aD0C0C4EE4385b3233f2Cb06730334a true \
+  0x9506C0E5CEe9AD1dEe65B3539268D61CCB25aFB6 true \
   --private-key $PRIVATE_KEY \
   --rpc-url $RPC_URL
 
 cast send $FACTORY_ADDRESS \
   "setBondingCurveAllowed(address,bool)" \
-  0xc7fB91B6cd3C67E02EC08013CEBb29b1241f3De5 true \
+  0xd0A2f4ae5E816ec09374c67F6532063B60dE037B true \
   --private-key $PRIVATE_KEY \
   --rpc-url $RPC_URL
 
 cast send $FACTORY_ADDRESS \
   "setBondingCurveAllowed(address,bool)" \
-  0x1fD5876d4A3860Eb0159055a3b7Cb79fdFFf6B67 true \
+  0x4f1627be4C72aEB9565D4c751550C4D262a96B51 true \
   --private-key $PRIVATE_KEY \
   --rpc-url $RPC_URL
 
@@ -184,7 +184,8 @@ NEXT_PUBLIC_IPFS_URL=https://ipfs.io
 
 ### "Bonding curve not whitelisted" error
 - Make sure you've whitelisted all 4 sudoswap bonding curves
-- Verify the addresses are correct (they're Ethereum Mainnet addresses, but stateless)
+- Verify the addresses are correct (use Base Mainnet addresses, not Ethereum Mainnet)
+- If you accidentally whitelisted Ethereum addresses, use `fix-base-bonding-curves.sh` to fix it
 
 ### "Router not whitelisted" error
 - Make sure you've whitelisted your router address in the factory
@@ -201,7 +202,7 @@ NEXT_PUBLIC_IPFS_URL=https://ipfs.io
 
 ## Notes
 
-- **Bonding curves are stateless**: The sudoswap bonding curves deployed on Ethereum Mainnet can be reused on Base because they have no state. They're pure calculation contracts.
+- **Bonding curves**: The sudoswap bonding curves are deployed separately on Base Mainnet. Use the Base Mainnet addresses, not Ethereum Mainnet addresses.
 - **Fee collection**: Your factory will collect protocol fees according to `PROTOCOL_FEE_MULTIPLIER` and send them to `PROTOCOL_FEE_RECIPIENT`.
 - **Factory ownership**: The `FACTORY_OWNER` address has full control over the factory, including fee updates and whitelisting.
 

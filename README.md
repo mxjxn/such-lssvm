@@ -271,13 +271,41 @@ The contracts have been deployed on Base Mainnet. See the [Base Deployment Summa
 - LSSVMPairERC1155ETH: [0xF130207fbE0913b5470732D25699E41F5Ea4da7f](https://basescan.org/address/0xF130207fbE0913b5470732D25699E41F5Ea4da7f)
 - LSSVMPairERC1155ERC20: [0x68f397655a5a1478e24Bdb52D0Df33e50AB6Ce28](https://basescan.org/address/0x68f397655a5a1478e24Bdb52D0Df33e50AB6Ce28)
 
-**Bonding Curves** (Reused from Sudoswap - Ethereum Mainnet)
+**Bonding Curves** (Base Mainnet)
 
-- LinearCurve: [0xe5d78fec1a7f42d2F3620238C498F088A866FdC5](https://etherscan.io/address/0xe5d78fec1a7f42d2f3620238c498f088a866fdc5)
-- ExponentialCurve: [0xfa056C602aD0C0C4EE4385b3233f2Cb06730334a](https://etherscan.io/address/0xfa056c602ad0c0c4ee4385b3233f2cb06730334a)
-- XykCurve: [0xc7fB91B6cd3C67E02EC08013CEBb29b1241f3De5](https://etherscan.io/address/0xc7fb91b6cd3c67e02ec08013cebb29b1241f3de5)
-- GDACurve: [0x1fD5876d4A3860Eb0159055a3b7Cb79fdFFf6B67](https://etherscan.io/address/0x1fd5876d4a3860eb0159055a3b7cb79fdfff6b67)
+- LinearCurve: [0xe41352CB8D9af18231E05520751840559C2a548A](https://basescan.org/address/0xe41352CB8D9af18231E05520751840559C2a548A)
+- ExponentialCurve: [0x9506C0E5CEe9AD1dEe65B3539268D61CCB25aFB6](https://basescan.org/address/0x9506C0E5CEe9AD1dEe65B3539268D61CCB25aFB6)
+- XykCurve: [0xd0A2f4ae5E816ec09374c67F6532063B60dE037B](https://basescan.org/address/0xd0A2f4ae5E816ec09374c67F6532063B60dE037B)
+- GDACurve: [0x4f1627be4C72aEB9565D4c751550C4D262a96B51](https://basescan.org/address/0x4f1627be4C72aEB9565D4c751550C4D262a96B51)
 
-> **Note**: The bonding curves are stateless contracts deployed on Ethereum Mainnet and can be reused on Base. All curves are whitelisted in the Base factory.
+> **⚠️ Important**: The initial deployment whitelisted Ethereum Mainnet addresses. These need to be replaced with the Base Mainnet addresses listed above. See the deployment summary for a fix script.
 
 For complete deployment details, configuration, and next steps, see the [Base Deployment Summary](./packages/lssvm-contracts/BASE_DEPLOYMENT_SUMMARY.md).
+
+### Base Sepolia Testnet (mxjxn)
+
+The contracts have been deployed on Base Sepolia testnet for testing. See the [Base Testnet Deployment Summary](./packages/lssvm-contracts/BASE_TESTNET_DEPLOYMENT_SUMMARY.md) for complete details.
+
+**Factory & Router**
+
+- LSSVMPairFactory: [0x372990Fd91CF61967325dD5270f50c4192bfb892](https://sepolia.basescan.org/address/0x372990Fd91CF61967325dD5270f50c4192bfb892)
+- VeryFastRouter: [0x6C9e6BAc4255901EaD3447C07917967E9dBc32d3](https://sepolia.basescan.org/address/0x6C9e6BAc4255901EaD3447C07917967E9dBc32d3)
+
+**Core Contracts**
+
+- RoyaltyEngine: [0xc51303BfE0a4d268137a0910073f907dCB8Bc51f](https://sepolia.basescan.org/address/0xc51303BfE0a4d268137a0910073f907dCB8Bc51f)
+- LSSVMPairERC721ETH: [0x723124567064B038e6fA2C247E8815B06443C43a](https://sepolia.basescan.org/address/0x723124567064B038e6fA2C247E8815B06443C43a)
+- LSSVMPairERC721ERC20: [0x3CEE515879FFe4620a1F8aC9bf09B97e858815Ef](https://sepolia.basescan.org/address/0x3CEE515879FFe4620a1F8aC9bf09B97e858815Ef)
+- LSSVMPairERC1155ETH: [0x065Ab76c7e9Edcfb3bF25B9076235e7A5ffA76f4](https://sepolia.basescan.org/address/0x065Ab76c7e9Edcfb3bF25B9076235e7A5ffA76f4)
+- LSSVMPairERC1155ERC20: [0x1Cb0c1F72Ba7547fC99c4b5333d8aBA1eD6b31A9](https://sepolia.basescan.org/address/0x1Cb0c1F72Ba7547fC99c4b5333d8aBA1eD6b31A9)
+
+**Bonding Curves** (Base Sepolia Testnet)
+
+- LinearCurve: [0x3F1E31d662eD24b6B69d73B07C98076d3814F8C0](https://sepolia.basescan.org/address/0x3F1E31d662eD24b6B69d73B07C98076d3814F8C0)
+- ExponentialCurve: [0x4637d06530d5D375B1D5dE1117C98b0c6EA7eDd1](https://sepolia.basescan.org/address/0x4637d06530d5D375B1D5dE1117C98b0c6EA7eDd1)
+- XykCurve: [0xC4DfB54Ca18c9e5EC2a23e8DE09588982A6b2242](https://sepolia.basescan.org/address/0xC4DfB54Ca18c9e5EC2a23e8DE09588982A6b2242)
+- GDACurve: [0x60bAB2734eb85F07Ca93E3B7Fb1015fcc5e9CbA7](https://sepolia.basescan.org/address/0x60bAB2734eb85F07Ca93E3B7Fb1015fcc5e9CbA7)
+
+> **Note**: This is a testnet deployment. All bonding curves were deployed fresh on Base Sepolia. All curves are whitelisted in the factory.
+
+For complete deployment details, configuration, and next steps, see the [Base Testnet Deployment Summary](./packages/lssvm-contracts/BASE_TESTNET_DEPLOYMENT_SUMMARY.md).
