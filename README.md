@@ -308,4 +308,9 @@ The contracts have been deployed on Base Sepolia testnet for testing. See the [B
 
 > **Note**: This is a testnet deployment. All bonding curves were deployed fresh on Base Sepolia. All curves are whitelisted in the factory.
 
-For complete deployment details, configuration, and next steps, see the [Base Testnet Deployment Summary](./packages/lssvm-contracts/BASE_TESTNET_DEPLOYMENT_SUMMARY.md).
+**Test NFT Contracts** (Base Sepolia Testnet)
+
+- TestNFT721: [0xF130207fbE0913b5470732D25699E41F5Ea4da7f](https://sepolia.basescan.org/address/0xF130207fbE0913b5470732D25699E41F5Ea4da7f) - 100 tokens (IDs 0-99)
+- TestNFT1155: [0x68f397655a5a1478e24Bdb52D0Df33e50AB6Ce28](https://sepolia.basescan.org/address/0x68f397655a5a1478e24Bdb52D0Df33e50AB6Ce28) - Item 0: 10 copies, Item 1: 1000 copies
+
+For complete deployment details, configuration, and next steps, see the [Base Testnet Deployment Summary](./packages/lssvm-contracts/BASE_TESTNET_DEPLOYMENT_SUMMARY.md). For test NFT usage, see [TEST_NFTS.md](./packages/lssvm-contracts/TEST_NFTS.md).

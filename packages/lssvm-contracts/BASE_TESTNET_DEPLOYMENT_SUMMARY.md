@@ -75,6 +75,19 @@ All transactions were successfully broadcast to Base Sepolia testnet. Key transa
 - Contract verification can be completed later (not critical for functionality)
 - This is a testnet deployment - use testnet ETH only
 
+## Test NFT Contracts
+
+Test NFT contracts have been deployed for testing pools:
+
+- **TestNFT721**: [`0xF130207fbE0913b5470732D25699E41F5Ea4da7f`](https://sepolia.basescan.org/address/0xF130207fbE0913b5470732D25699E41F5Ea4da7f)
+  - 100 tokens pre-minted (IDs 0-99)
+  
+- **TestNFT1155**: [`0x68f397655a5a1478e24Bdb52D0Df33e50AB6Ce28`](https://sepolia.basescan.org/address/0x68f397655a5a1478e24Bdb52D0Df33e50AB6Ce28)
+  - Item 0 (ID 0): 10 copies
+  - Item 1 (ID 1): 1000 copies
+
+For detailed information on using these test NFTs, see [TEST_NFTS.md](./TEST_NFTS.md).
+
 ## Next Steps
 
 1. **Update Miniapp Configuration**:
@@ -86,7 +99,9 @@ All transactions were successfully broadcast to Base Sepolia testnet. Key transa
    Restart your Next.js dev server after updating for changes to take effect.
 
 2. **Test the Deployment**:
-   - Create a test pool using the deployed factory
+   - Create a test pool using the deployed factory and test NFTs
+   - Use TestNFT721 for ERC721/ETH pools
+   - Use TestNFT1155 for ERC1155/ETH pools
    - Verify the pool appears in the miniapp
    - Test buying and selling NFTs on testnet
 

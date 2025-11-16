@@ -90,5 +90,16 @@ Deploy to Base mainnet:
 
 See [DEPLOY_BASE.md](./DEPLOY_BASE.md) for detailed mainnet deployment instructions.
 
+### Test NFT Contracts
+
+Deploy test NFT contracts for testing pools:
+
+```bash
+# Deploy test NFTs (ERC721 with 100 tokens, ERC1155 with 2 items)
+./deploy-test-nfts.sh
+```
+
+See [TEST_NFTS.md](./TEST_NFTS.md) for detailed information on test NFT contracts and usage.
+
 For details on deployment improvements and best practices, see [DEPLOYMENT_IMPROVEMENTS.md](./DEPLOYMENT_IMPROVEMENTS.md).
 
