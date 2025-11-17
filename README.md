@@ -33,6 +33,7 @@ This repository is organized as a [Turborepo](https://turbo.build/repo) monorepo
 - **`apps/indexer`** - Graph Protocol subgraph for indexing pool creation and swap events (by mxjxn)
 - **`apps/docs`** - Documentation website deployed to GitHub Pages (by mxjxn)
 - **`packages/lssvm-contracts`** - Solidity contracts for the LSSVM protocol (from sudoswap)
+- **`packages/lssvm-abis`** - Shared ABIs, addresses, and types package for cross-repo integration
 
 ### Getting Started
 
@@ -441,3 +442,20 @@ The contracts have been deployed on Base Sepolia testnet for testing. See the [B
 - TestNFT1155: [0x68f397655a5a1478e24Bdb52D0Df33e50AB6Ce28](https://sepolia.basescan.org/address/0x68f397655a5a1478e24Bdb52D0Df33e50AB6Ce28) - Item 0: 10 copies, Item 1: 1000 copies
 
 For complete deployment details, configuration, and next steps, see the [Base Testnet Deployment Summary](./packages/lssvm-contracts/BASE_TESTNET_DEPLOYMENT_SUMMARY.md). For test NFT usage, see [TEST_NFTS.md](./packages/lssvm-contracts/TEST_NFTS.md).
+
+## Cross-Repo Integration
+
+The `@lssvm/abis` package (`packages/lssvm-abis/`) is designed to be used across repositories. It exports all LSSVM ABIs, contract addresses, and TypeScript types for use in other projects.
+
+**Package Location:** `packages/lssvm-abis/`
+
+**Usage in Other Repos:**
+```json
+{
+  "dependencies": {
+    "@lssvm/abis": "workspace:git+https://github.com/mxjxn/such-lssvm.git#main:packages/lssvm-abis"
+  }
+}
+```
+
+The package is currently integrated with the `cryptoart-monorepo` to enable LSSVM pool creation in the cryptoart-studio app. See `TASKLIST.md` for integration details and `cryptoart-monorepo/LSSVM_INTEGRATION.md` for usage examples.

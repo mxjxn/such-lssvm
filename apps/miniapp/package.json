@@ -13,6 +13,7 @@
   "dependencies": {
     "@farcaster/miniapp-sdk": "^0.2.1",
     "@farcaster/miniapp-wagmi-connector": "^1.1.0",
+    "@lssvm/abis": "workspace:*",
     "@tanstack/react-query": "5.17.0",
     "@types/node": "20.10.0",
     "@types/react": "18.2.42",
