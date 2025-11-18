@@ -64,6 +64,7 @@ a, button, [role="button"] {
 }
 
 /* Ensure gradient text masking works properly - exclude from transitions */
+.gradient-text,
 h1[style*="background-clip"],
 h1[style*="backgroundImage"] {
   -webkit-background-clip: text !important;

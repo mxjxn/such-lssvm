@@ -22,7 +22,7 @@ export function GradientHeader({ children, className = '' }: GradientHeaderProps
 
   return (
     <h1
-      className={`font-mono font-bold ${className}`}
+      className={`font-mono font-bold gradient-text ${className}`}
       style={gradientStyle}
     >
       {children}
