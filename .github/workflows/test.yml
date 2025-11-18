@@ -59,9 +59,16 @@ jobs:
 
             - name: Clean LCOV
               run: |
-                  lcov --remove lcov.info -o lcov.info 'src/mocks/*' 'src/test/*' 'src/testgen-scripts/*' 'src/lib/*' 'script/*'
+                  if [ -f lcov.info ]; then
+                      lcov --remove lcov.info -o lcov.info 'src/mocks/*' 'src/test/*' 'src/testgen-scripts/*' 'src/lib/*' 'script/*'
+                  else
+                      echo "lcov.info not found, skipping cleanup"
+                  fi
 
             - name: Upload coverage reports to Codecov
+              if: always() && hashFiles('lcov.info') != ''
               uses: codecov/codecov-action@v3.1.1
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
+                  files: lcov.info
+                  fail_ci_if_error: false
