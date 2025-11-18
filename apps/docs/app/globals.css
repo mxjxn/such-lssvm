@@ -63,12 +63,14 @@ a, button, [role="button"] {
   transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Ensure gradient text masking works properly */
-h1[style*="background-clip"] {
+/* Ensure gradient text masking works properly - exclude from transitions */
+h1[style*="background-clip"],
+h1[style*="backgroundImage"] {
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
+  transition: background-image 0.3s ease !important;
 }
 
 /* Range input styling for terminal aesthetic */
