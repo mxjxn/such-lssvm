@@ -40,7 +40,7 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
 
   const colors = generateColorScheme(hue)
 
-  // Apply CSS variables to root
+  // Apply CSS variables to root immediately and on color changes
   useEffect(() => {
     if (typeof document !== 'undefined') {
       const root = document.documentElement
@@ -57,6 +57,25 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
       root.style.setProperty('--color-accent', colors.accent)
     }
   }, [colors])
+
+  // Also set initial values on mount (before colors are calculated)
+  useEffect(() => {
+    if (typeof document !== 'undefined' && !mounted) {
+      const initialColors = generateColorScheme(hue)
+      const root = document.documentElement
+      root.style.setProperty('--color-primary', initialColors.primary)
+      root.style.setProperty('--color-secondary', initialColors.secondary)
+      root.style.setProperty('--color-tertiary', initialColors.tertiary)
+      root.style.setProperty('--color-success', initialColors.success)
+      root.style.setProperty('--color-warning', initialColors.warning)
+      root.style.setProperty('--color-error', initialColors.error)
+      root.style.setProperty('--color-background', initialColors.background)
+      root.style.setProperty('--color-background-gradient', initialColors.backgroundGradient)
+      root.style.setProperty('--color-text', initialColors.text)
+      root.style.setProperty('--color-border', initialColors.border)
+      root.style.setProperty('--color-accent', initialColors.accent)
+    }
+  }, [hue, mounted])
 
   return (
     <ColorSchemeContext.Provider value={{ hue, setHue, colors }}>

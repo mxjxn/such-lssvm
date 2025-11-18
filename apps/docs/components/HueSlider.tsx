@@ -7,7 +7,7 @@ export function HueSlider() {
 
   return (
     <div className="flex items-center gap-2 text-xs font-mono" style={{ color: 'var(--color-text)' }}>
-      <label htmlFor="hue-slider" className="min-w-[35px] uppercase">
+      <label htmlFor="hue-slider" className="min-w-[35px] uppercase whitespace-nowrap">
         HUE
       </label>
       <input
@@ -18,9 +18,10 @@ export function HueSlider() {
         value={hue}
         step="1"
         onChange={(e) => setHue(parseInt(e.target.value, 10))}
-        className="flex-1 h-1"
+        className="flex-1 h-1 min-w-[100px]"
+        style={{ minWidth: '100px' }}
       />
-      <span className="min-w-[30px] text-right tabular-nums font-mono">{hue}</span>
+      <span className="min-w-[35px] text-right tabular-nums font-mono whitespace-nowrap">{hue}°</span>
     </div>
   )
 }
