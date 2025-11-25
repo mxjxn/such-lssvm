@@ -1,5 +1,5 @@
 {
-  "name": "@lssvm/abis",
+  "name": "@mxjxn/lssvm-abis",
   "version": "0.1.0",
   "description": "Shared ABIs, addresses, and types for LSSVM (Liquidity-Sensitive Single-Variant Market) contracts",
   "license": "AGPL-3.0",
