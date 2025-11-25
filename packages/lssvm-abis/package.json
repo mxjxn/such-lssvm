@@ -1,10 +1,16 @@
 {
   "name": "@lssvm/abis",
   "version": "0.1.0",
-  "private": true,
+  "description": "Shared ABIs, addresses, and types for LSSVM (Liquidity-Sensitive Single-Variant Market) contracts",
   "license": "AGPL-3.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -14,7 +20,8 @@
   "scripts": {
     "build": "tsc",
     "check-types": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
     "viem": "^2.39.0"
@@ -24,6 +31,24 @@
   },
   "peerDependencies": {
     "viem": "^2.39.0"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mxjxn/such-lssvm.git",
+    "directory": "packages/lssvm-abis"
+  },
+  "keywords": [
+    "lssvm",
+    "sudoswap",
+    "nft",
+    "liquidity",
+    "pool",
+    "abi",
+    "ethereum",
+    "base"
+  ]
 }
 

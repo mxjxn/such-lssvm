@@ -5,7 +5,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ lssvm-subgraph",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ --deploy-key 53fb8f461755ac2d5c69f94b4bd92572 such-lssvm",
     "create-local": "graph create --node http://localhost:8020/ lssvm-subgraph",
     "remove-local": "graph remove --node http://localhost:8020/ lssvm-subgraph",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 lssvm-subgraph",

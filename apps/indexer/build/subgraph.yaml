@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: LSSVMPairFactory
-    network: base-sepolia
+    network: base
     source:
-      address: "0x372990Fd91CF61967325dD5270f50c4192bfb892"
+      address: "0xF6B4bDF778db19DD5928248DE4C18Ce22E8a5f5e"
       abi: LSSVMPairFactory
-      startBlock: 0
+      startBlock: 38239761
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -35,7 +35,7 @@ dataSources:
 templates:
   - name: LSSVMPair
     kind: ethereum
-    network: base-sepolia
+    network: base
     source:
       abi: LSSVMPair
     mapping:
