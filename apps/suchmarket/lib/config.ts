@@ -26,20 +26,9 @@ export const CONFIG = {
   BASE_RPC_URL: process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org',
   BASE_SEPOLIA_RPC_URL: process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC_URL || 'https://sepolia.base.org',
   IPFS_URL: process.env.NEXT_PUBLIC_IPFS_URL || 'https://ipfs.io',
-  // Subgraph endpoints
-  SUBGRAPH_ENDPOINT_8453: 'https://api.studio.thegraph.com/query/5440/such-lssvm/0.0.1',
-  SUBGRAPH_ENDPOINT_84532: 'https://api.studio.thegraph.com/query/5440/such-lssvm-sepolia/0.0.1',
+  // Optional legacy subgraph endpoints (explore uses RPC indexer by default)
+  SUBGRAPH_ENDPOINT_8453: process.env.NEXT_PUBLIC_SUBGRAPH_ENDPOINT_8453 || '',
+  SUBGRAPH_ENDPOINT_84532: process.env.NEXT_PUBLIC_SUBGRAPH_ENDPOINT_84532 || '',
 } as const
 
-// Validate required addresses
-if (typeof window !== 'undefined') {
-  console.log('=== Config Debug ===')
-  console.log('ROUTER_ADDRESS_8453 from env:', process.env.NEXT_PUBLIC_ROUTER_ADDRESS_8453)
-  console.log('ROUTER_ADDRESS_8453 final:', CONFIG.ROUTER_ADDRESS_8453)
-  console.log('FACTORY_ADDRESS_8453 from env:', process.env.NEXT_PUBLIC_FACTORY_ADDRESS_8453)
-  console.log('FACTORY_ADDRESS_8453 final:', CONFIG.FACTORY_ADDRESS_8453)
-  console.log('BASE_RPC_URL:', CONFIG.BASE_RPC_URL)
-  console.log('All NEXT_PUBLIC_ vars:', Object.keys(process.env).filter(k => k.startsWith('NEXT_PUBLIC_')))
-  console.log('===================')
-}
 

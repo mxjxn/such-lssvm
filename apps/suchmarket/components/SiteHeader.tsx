@@ -3,49 +3,95 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { base, baseSepolia } from 'viem/chains'
+import { WalletButton } from './WalletButton'
+import { useAppChain } from '@/contexts/ChainContext'
+
+const NAV = [
+  { href: '/explore', label: 'Explore' },
+  { href: '/create', label: 'Create pool' },
+  { href: '/launch', label: 'Launch' },
+  { href: '/my-pools', label: 'My pools' },
+  { href: '/auctions', label: 'Auctions', soon: true },
+]
 
 export function SiteHeader() {
   const pathname = usePathname()
-  const isHome = pathname === '/'
+  const { chainId, setChainId } = useAppChain()
+
+  if (pathname?.startsWith('/embed')) {
+    return null
+  }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gold/20 bg-obsidian/90 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-        <Link href="/" className="group flex items-center gap-3 min-w-0">
-          <div
-            className="w-10 h-10 shrink-0 rounded-sm flex items-center justify-center font-display text-gold text-lg border border-gold/40 bg-imperial/50"
-            aria-hidden
-          >
-            S
-          </div>
-          <div className="min-w-0">
-            <div className="font-display text-sm md:text-base uppercase tracking-[0.25em] text-champagne group-hover:text-gold-light transition-colors truncate">
-              Suchmarket
-            </div>
-            <div className="font-serif text-xs italic text-champagne/50 hidden sm:block">
-              Fine Art Liquidity Exchange
-            </div>
-          </div>
-        </Link>
+    <header className="sticky top-0 z-40 border-b border-line/80 bg-paper/90 backdrop-blur-md">
+      <div className="sm-container flex h-14 items-center justify-between gap-4">
+        <div className="flex items-center gap-8 min-w-0">
+          <Link href="/" className="shrink-0">
+            <span className="font-display text-xl tracking-tight text-ink">such.market</span>
+          </Link>
+          <nav className="hidden md:flex items-center gap-1" aria-label="Primary">
+            {NAV.map((item) => {
+              const active = pathname === item.href || pathname?.startsWith(item.href + '/')
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`rounded-md px-3 py-1.5 text-sm transition ${
+                    active ? 'bg-mist text-ink' : 'text-mute hover:text-ink hover:bg-mist/70'
+                  }`}
+                >
+                  {item.label}
+                  {item.soon && (
+                    <span className="ml-1.5 text-[10px] uppercase tracking-wider text-soft">Soon</span>
+                  )}
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
 
-        <nav className="flex items-center gap-2 md:gap-4" aria-label="Main">
-          <Link
-            href={`/create/${base.id}`}
-            className="sm-btn-secondary hidden sm:inline-block"
-          >
-            Create Pool
-          </Link>
-          <Link href={`/create/${baseSepolia.id}`} className="sm-btn-secondary text-[10px] sm:text-xs">
-            Sepolia
-          </Link>
-          {!isHome && (
-            <Link href="/" className="font-display text-xs uppercase tracking-widest text-gold/80 hover:text-gold">
-              Salon
-            </Link>
-          )}
-        </nav>
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:flex rounded-md border border-line bg-white p-0.5">
+            <button
+              type="button"
+              onClick={() => setChainId(base.id)}
+              className={`rounded px-2.5 py-1 text-xs ${
+                chainId === base.id ? 'bg-ink text-white' : 'text-mute hover:text-ink'
+              }`}
+            >
+              Base
+            </button>
+            <button
+              type="button"
+              onClick={() => setChainId(baseSepolia.id)}
+              className={`rounded px-2.5 py-1 text-xs ${
+                chainId === baseSepolia.id ? 'bg-ink text-white' : 'text-mute hover:text-ink'
+              }`}
+            >
+              Sepolia
+            </button>
+          </div>
+          <WalletButton />
+        </div>
       </div>
-      <div className="sm-divider opacity-60" />
+
+      {/* Mobile nav */}
+      <nav
+        className="md:hidden flex gap-1 overflow-x-auto border-t border-line px-4 py-2"
+        aria-label="Mobile"
+      >
+        {NAV.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`shrink-0 rounded-full px-3 py-1 text-xs ${
+              pathname?.startsWith(item.href) ? 'bg-mist text-ink' : 'text-mute'
+            }`}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
     </header>
   )
 }

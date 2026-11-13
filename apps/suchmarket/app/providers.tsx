@@ -3,59 +3,64 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider, createConfig, http } from 'wagmi'
 import { base, baseSepolia } from 'wagmi/chains'
+import { injected } from 'wagmi/connectors'
 import { useState, useEffect } from 'react'
 import { farcasterFrame } from '@farcaster/miniapp-wagmi-connector'
 import { CartProvider } from '@/contexts/CartContext'
 import { CONFIG } from '@/lib/config'
+import { ChainProvider } from '@/contexts/ChainContext'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 15_000,
+      retry: 1,
+    },
+  },
+})
 
-// Create wagmi config with Farcaster miniapp connector
-// Supporting Base Mainnet and Base Sepolia
 export const config = createConfig({
   chains: [base, baseSepolia],
   transports: {
     [base.id]: http(CONFIG.BASE_RPC_URL),
     [baseSepolia.id]: http(CONFIG.BASE_SEPOLIA_RPC_URL),
   },
-  connectors: [
-    farcasterFrame(),
-  ],
+  connectors: [injected({ shimDisconnect: true }), farcasterFrame()],
 })
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [isReady, setIsReady] = useState(false)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    // Initialize Farcaster miniapp SDK
-    const initSDK = async () => {
+    const init = async () => {
       try {
-        // Dynamically import to avoid SSR issues
         const { sdk } = await import('@farcaster/miniapp-sdk')
         await sdk.actions.ready()
-        setIsReady(true)
-      } catch (error) {
-        console.error('Failed to initialize SDK:', error)
-        setIsReady(true) // Continue anyway for development
+      } catch {
+        // Browser / non-miniapp context is fine
+      } finally {
+        setReady(true)
       }
     }
-    
-    // Only initialize in browser
-    if (typeof window !== 'undefined') {
-      initSDK()
-    } else {
-      setIsReady(true)
-    }
+    if (typeof window !== 'undefined') init()
+    else setReady(true)
   }, [])
+
+  if (!ready) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-paper text-mute text-sm">
+        Loading Suchmarket…
+      </div>
+    )
+  }
 
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <CartProvider>
-          {children}
-        </CartProvider>
+        <ChainProvider>
+          <CartProvider>{children}</CartProvider>
+        </ChainProvider>
       </QueryClientProvider>
     </WagmiProvider>
   )
 }
-

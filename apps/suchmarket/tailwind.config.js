@@ -8,33 +8,26 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        obsidian: '#07040f',
-        velvet: '#12081f',
-        imperial: '#2a1545',
-        burgundy: '#5c1838',
-        crimson: '#8b2252',
-        gold: '#c9a227',
-        'gold-light': '#e8d48b',
-        champagne: '#f4e4bc',
-        rose: '#e8b4b8',
-        parchment: '#faf3e8',
-        jade: '#1a4d3e',
-        'jade-light': '#2d7a62',
+        ink: '#121212',
+        paper: '#F8F8F6',
+        mist: '#EFEFED',
+        line: '#E2E2DE',
+        mute: '#5C5C5C',
+        soft: '#8A8A86',
+        forest: '#2C5F4F',
+        'forest-deep': '#1E4338',
+        clay: '#A65D4E',
+        warn: '#8B4513',
       },
       fontFamily: {
-        display: ['var(--font-cinzel)', 'serif'],
-        serif: ['var(--font-cormorant)', 'serif'],
-        body: ['var(--font-playfair)', 'serif'],
-        accent: ['var(--font-italiana)', 'serif'],
+        display: ['var(--font-fraunces)', 'Georgia', 'serif'],
+        sans: ['var(--font-sora)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
-      backgroundImage: {
-        damask:
-          'radial-gradient(ellipse at 20% 30%, rgba(201,162,39,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(139,34,82,0.12) 0%, transparent 50%)',
-        'velvet-gradient': 'linear-gradient(180deg, #12081f 0%, #07040f 40%, #1a0a2e 100%)',
+      maxWidth: {
+        content: '72rem',
       },
       boxShadow: {
-        gilded: '0 0 0 1px rgba(201,162,39,0.4), 0 4px 24px rgba(201,162,39,0.15)',
-        baroque: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,162,39,0.25)',
+        soft: '0 1px 2px rgba(18,18,18,0.04), 0 8px 24px rgba(18,18,18,0.04)',
       },
     },
   },

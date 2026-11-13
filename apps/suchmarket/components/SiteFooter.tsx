@@ -1,17 +1,41 @@
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+
 export function SiteFooter() {
+  const pathname = usePathname()
+  if (pathname?.startsWith('/embed')) return null
+
   return (
-    <footer className="border-t border-gold/15 bg-obsidian mt-auto">
-      <div className="sm-divider mb-0" />
-      <div className="max-w-7xl mx-auto px-4 py-10 text-center">
-        <p className="font-accent text-gold text-2xl mb-2" aria-hidden>
-          ✦ ✦ ✦
-        </p>
-        <p className="font-display text-xs uppercase tracking-[0.3em] text-champagne/50">
-          Suchmarket — LSSVM on Base
-        </p>
-        <p className="font-serif text-sm italic text-champagne/35 mt-2">
-          A salon for connoisseurs of on-chain liquidity
-        </p>
+    <footer className="mt-auto border-t border-line bg-paper">
+      <div className="sm-container py-10 flex flex-col sm:flex-row gap-6 sm:items-end sm:justify-between">
+        <div>
+          <p className="font-display text-lg text-ink">such.market</p>
+          <p className="mt-1 max-w-md text-sm text-mute leading-relaxed">
+            NFT AMM pools on Base — the sales home for the cryptoart ecosystem.
+            Studio launches contracts; social embeds the market; auctions arrive here next.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-4 text-sm text-mute">
+          <Link href="/explore" className="hover:text-ink">
+            Explore
+          </Link>
+          <Link href="/launch" className="hover:text-ink">
+            Launch with a pool
+          </Link>
+          <Link href="/auctions" className="hover:text-ink">
+            Auctions
+          </Link>
+          <a
+            href="https://github.com/mxjxn/such-lssvm"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-ink"
+          >
+            Protocol
+          </a>
+        </div>
       </div>
     </footer>
   )

@@ -1,189 +1,181 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { isAddress } from 'viem'
+import Link from 'next/link'
+import { Address, isAddress, getAddress } from 'viem'
 import { usePoolData } from '@/hooks/usePoolData'
-import { PoolDetails } from '@/components/PoolDetails'
-import { Address } from 'viem'
-import { base } from 'viem/chains'
-import { useState, useEffect } from 'react'
+import { CurveExplainer } from '@/components/CurveExplainer'
+import { TradePanel } from '@/components/TradePanel'
 import { getPublicClient } from '@/lib/wagmi'
 import { LSSVM_PAIR_ABI } from '@/lib/contracts'
+import { getChainName, getCurveType, isSupportedChainId, poolTypeLabel } from '@/lib/chains'
+import { formatEth, formatFeeBps } from '@/lib/quotes'
+import { PAIR_MANAGE_ABI } from '@/lib/pairManage'
 
-function getChainFromId(chainId: string | string[]) {
-  const id = typeof chainId === 'string' ? parseInt(chainId) : parseInt(chainId[0])
-  if (id !== base.id) {
-    throw new Error(`Unsupported chain: ${id}. Only Base Mainnet (${base.id}) is currently supported.`)
-  }
-  return base
-}
-
-export default function PoolPage() {
+export default function PoolDetailPage() {
   const params = useParams()
-  const chainId = params.chainId as string
-  const poolAddress = params.poolAddress as string
+  const chainIdRaw = Array.isArray(params.chainId) ? params.chainId[0] : params.chainId
+  const poolRaw = Array.isArray(params.poolAddress) ? params.poolAddress[0] : params.poolAddress
+  const chainId = parseInt(chainIdRaw || '8453', 10)
 
-  const chain = getChainFromId(chainId)
-  
-  const [isERC1155, setIsERC1155] = useState<boolean>(false)
+  if (!isSupportedChainId(chainId) || !poolRaw || !isAddress(poolRaw)) {
+    return (
+      <div className="sm-container py-16 text-center text-mute text-sm">Invalid pool link.</div>
+    )
+  }
+
+  const poolAddress = getAddress(poolRaw) as Address
+  const { data: pool, isLoading, error } = usePoolData(poolAddress, chainId)
+  const [isERC1155, setIsERC1155] = useState(false)
   const [poolNftId, setPoolNftId] = useState<bigint | null>(null)
-  const [isDetectingERC1155, setIsDetectingERC1155] = useState<boolean>(true)
+  const [owner, setOwner] = useState<Address | null>(null)
 
-  const { data: poolData, isLoading, error } = usePoolData(poolAddress as Address, chain.id)
-
-  // Detect ERC1155 pool
   useEffect(() => {
-    if (!poolData?.address || !chain) return
-
-    const detectERC1155 = async () => {
-      setIsDetectingERC1155(true)
-      const client = getPublicClient(chain.id)
-      
-      // Method 1: Try calling nftId() - ERC1155 pairs have this, ERC721 pairs don't
-      // This is expected to fail for ERC721 pools, so we silently catch and continue
+    if (!pool) return
+    const client = getPublicClient(chainId)
+    ;(async () => {
       try {
-        const nftId = await client.readContract({
-          address: poolData.address,
-          abi: LSSVM_PAIR_ABI,
-          functionName: 'nftId',
-        }) as bigint
-        
-        setIsERC1155(true)
-        setPoolNftId(nftId)
-        setIsDetectingERC1155(false)
-        return
-      } catch (nftIdError) {
-        // Expected to fail for ERC721 pools - silently continue to next detection method
-      }
-      
-      // Method 2: Try pairVariant()
-      try {
-        const pairVariant = await client.readContract({
-          address: poolData.address,
+        const variant = (await client.readContract({
+          address: poolAddress,
           abi: LSSVM_PAIR_ABI,
           functionName: 'pairVariant',
-        }) as number
-        
-        console.log('Pair variant:', pairVariant)
-        const is1155 = pairVariant === 2 || pairVariant === 3
-        setIsERC1155(is1155)
-        
-        if (is1155) {
-          // Try to get nftId
-          try {
-            const nftId = await client.readContract({
-              address: poolData.address,
-              abi: LSSVM_PAIR_ABI,
-              functionName: 'nftId',
-            }) as bigint
-            setPoolNftId(nftId)
-            console.log('Got pool nftId:', nftId.toString())
-          } catch (err) {
-            console.warn('Failed to get nftId:', err)
-          }
+        })) as number
+        const erc1155 = variant === 2 || variant === 3
+        setIsERC1155(erc1155)
+        if (erc1155) {
+          const id = (await client.readContract({
+            address: poolAddress,
+            abi: LSSVM_PAIR_ABI,
+            functionName: 'nftId',
+          })) as bigint
+          setPoolNftId(id)
         }
-        
-        setIsDetectingERC1155(false)
-        return
-      } catch (variantError) {
-        console.warn('Error calling pairVariant:', variantError)
-        setIsDetectingERC1155(false)
+      } catch {
+        setIsERC1155(false)
       }
-    }
+      try {
+        const o = (await client.readContract({
+          address: poolAddress,
+          abi: PAIR_MANAGE_ABI,
+          functionName: 'owner',
+        })) as Address
+        setOwner(o)
+      } catch {
+        setOwner(null)
+      }
+    })()
+  }, [pool, poolAddress, chainId])
 
-    detectERC1155()
-  }, [poolData?.address, chain])
+  if (isLoading) {
+    return <div className="sm-container py-16 text-center text-mute text-sm">Loading pool…</div>
+  }
 
-  if (!isAddress(poolAddress)) {
+  if (error || !pool) {
     return (
-      <main className="min-h-screen p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-red-600">Invalid pool address</div>
-        </div>
-      </main>
+      <div className="sm-container py-16 max-w-lg mx-auto text-center">
+        <p className="text-clay font-medium">Could not load pool</p>
+        <p className="mt-2 text-sm text-mute">{(error as Error)?.message || 'Unknown error'}</p>
+        <Link href="/explore" className="sm-btn-secondary inline-flex mt-6">
+          Back to explore
+        </Link>
+      </div>
     )
   }
 
-  if (isLoading || isDetectingERC1155) {
-    return (
-      <main className="min-h-screen p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col items-center justify-center gap-4 py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600"></div>
-            <div className="text-center">
-              <div className="text-lg font-semibold text-gray-900 mb-1">Loading pool data...</div>
-              <div className="text-sm text-gray-500">Fetching pool information and detecting pool type</div>
-            </div>
-          </div>
-        </div>
-      </main>
-    )
-  }
-
-  if (error || !poolData) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    const isInvalidPool = errorMessage.includes('not a valid LSSVM pool') || 
-                         errorMessage.includes('not a contract') ||
-                         errorMessage.includes('returned no data')
-    
-    return (
-      <main className="min-h-screen p-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white border border-red-200 rounded-xl p-8 shadow-sm">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <h2 className="text-xl font-semibold text-red-900 mb-2">
-                  {isInvalidPool ? 'Invalid Pool Address' : 'Error Loading Pool'}
-                </h2>
-                <p className="text-red-700 mb-4">
-                  {isInvalidPool 
-                    ? `The address "${poolAddress}" is not a valid LSSVM pool contract. It may be from a different factory or not exist on Base Mainnet.`
-                    : errorMessage
-                  }
-                </p>
-                {isInvalidPool && (
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4">
-                    <p className="text-sm text-gray-600 mb-2">
-                      <strong>Tips:</strong>
-                    </p>
-                    <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
-                      <li>Make sure the pool address is from the correct factory</li>
-                      <li>Verify the pool exists on Base Mainnet (chain ID: 8453)</li>
-                      <li>Check that you're using the correct pool address</li>
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-    )
-  }
+  const curveType = getCurveType(chainId, pool.bondingCurve)
 
   return (
-    <main className="min-h-screen p-4">
-      <div className="max-w-4xl mx-auto">
-        <PoolDetails 
-          poolAddress={poolData.address}
-          poolType={poolData.poolType}
-          spotPrice={poolData.spotPrice}
-          delta={poolData.delta}
-          fee={poolData.fee}
-          nftAddress={poolData.nft}
-          tokenAddress={poolData.token}
-          bondingCurve={poolData.bondingCurve}
-          chainId={chain.id}
-          isERC1155={isERC1155}
-          poolNftId={poolNftId || undefined}
-        />
+    <div className="sm-container py-8 md:py-12">
+      <div className="mb-6 flex flex-wrap items-center gap-2 text-xs text-soft">
+        <Link href="/explore" className="hover:text-ink">
+          Explore
+        </Link>
+        <span>/</span>
+        <span>{getChainName(chainId)}</span>
+        <span>/</span>
+        <span className="font-mono">{poolAddress.slice(0, 10)}…</span>
       </div>
-    </main>
+
+      <div className="grid lg:grid-cols-5 gap-8">
+        <div className="lg:col-span-3 space-y-6">
+          {/* Visual anchor */}
+          <div className="sm-card overflow-hidden">
+            <div
+              className="aspect-[16/10] bg-mist flex items-end p-6"
+              style={{
+                backgroundImage:
+                  'linear-gradient(135deg, #efefed 0%, #e2e8e4 40%, #d5ddd8 100%)',
+              }}
+            >
+              <div>
+                <p className="font-display text-3xl text-ink">{poolTypeLabel(pool.poolType)} pool</p>
+                <p className="mt-1 text-sm text-mute">
+                  {isERC1155 ? 'ERC-1155' : 'ERC-721'} · {curveType}
+                </p>
+              </div>
+            </div>
+            <div className="p-5 grid sm:grid-cols-3 gap-4 border-t border-line">
+              <Stat label="Spot price" value={`${formatEth(pool.spotPrice)} ETH`} />
+              <Stat label="Delta" value={`${formatEth(pool.delta)} ETH`} />
+              <Stat label="Pool fee" value={formatFeeBps(pool.fee)} />
+            </div>
+          </div>
+
+          <CurveExplainer
+            poolType={pool.poolType}
+            curveType={curveType}
+            spotPrice={pool.spotPrice}
+            delta={pool.delta}
+            fee={pool.fee}
+          />
+
+          <div className="sm-card p-5 space-y-2 text-sm">
+            <p>
+              <span className="text-soft">NFT contract</span>
+              <br />
+              <span className="font-mono text-xs break-all">{pool.nft}</span>
+            </p>
+            {owner && (
+              <p>
+                <span className="text-soft">Owner</span>
+                <br />
+                <span className="font-mono text-xs break-all">{owner}</span>
+              </p>
+            )}
+            <div className="pt-2 flex flex-wrap gap-3">
+              <Link
+                href={`/embed/pool/${chainId}/${poolAddress}`}
+                className="text-forest text-xs hover:underline"
+                target="_blank"
+              >
+                Embed card
+              </Link>
+              <Link href={`/my-pools`} className="text-forest text-xs hover:underline">
+                Manage my pools
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="lg:col-span-2">
+          <TradePanel
+            chainId={chainId}
+            poolAddress={poolAddress}
+            isERC1155={isERC1155}
+            poolNftId={poolNftId}
+          />
+        </div>
+      </div>
+    </div>
   )
 }
 
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[10px] uppercase tracking-wider text-soft">{label}</p>
+      <p className="mt-1 font-mono text-sm text-ink">{value}</p>
+    </div>
+  )
+}

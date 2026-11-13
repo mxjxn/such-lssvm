@@ -1,46 +1,40 @@
-# Suchmarket
+# such.market (`@lssvm/suchmarket`)
 
-**Suchmarket** is the hyper-maximalist fine-art front end for the LSSVM protocol. It lives alongside the original `apps/miniapp` in this monorepo — same trading logic, an entirely new visual identity.
+NFT AMM front end for Max’s LSSVM fork — the sales home for the cryptoart ecosystem.
 
-The miniapp remains unchanged. All redesign work happens here.
+- **cryptoart.studio** — artists manage contracts & launches (deep-links into `/launch`)
+- **such.market** — pools, trading, (soon) auctions
+- **cryptoart.social** — embeds `/embed/pool/...` and `/embed/collection/...`
 
-## Design direction
-
-- Baroque / salon aesthetic: gilded frames, ornate corners, jewel tones
-- Typography: Cinzel, Cormorant Garamond, Playfair Display, Italiana
-- Palette: obsidian, imperial purple, burgundy, gold, champagne
-
-## Run locally
-
-From the monorepo root:
+## Run
 
 ```bash
 pnpm install
 pnpm --filter @lssvm/suchmarket dev
+# http://localhost:3001
 ```
-
-Suchmarket runs on **port 3001** (miniapp uses the default 3000).
-
-## Environment
-
-Copy env vars from `apps/miniapp/ENV_VARS.md` into `apps/suchmarket/.env.local`:
 
 ```bash
-NEXT_PUBLIC_ROUTER_ADDRESS_8453=0x...
-NEXT_PUBLIC_FACTORY_ADDRESS_8453=0x...
-NEXT_PUBLIC_BASE_RPC_URL=https://base-mainnet.g.alchemy.com/v2/YOUR_KEY
-NEXT_PUBLIC_IPFS_URL=https://your-ipfs-gateway.example.com
+pnpm --filter @lssvm/suchmarket test
+pnpm --filter @lssvm/suchmarket build
 ```
 
-## Architecture
+Env: see `ENV_VARS.md`. Uses Base + Base Sepolia factory/router addresses from `@mxjxn/lssvm-abis`.
 
-| Layer | Location | Notes |
-|-------|----------|-------|
-| Design system | `components/design/`, `app/globals.css` | Gilded frames, tokens, theme overrides |
-| Shell | `SiteHeader`, `SiteFooter`, `PageChrome` | Salon chrome for all pages |
-| Trading logic | `hooks/`, `lib/`, `contexts/`, `app/api/` | Copied from miniapp; update both when protocol changes |
+## Data
 
-## Future
+Pool discovery uses **factory event logs via RPC** (`lib/indexer.ts`, `/api/pools`) — Vercel-friendly, no paid subgraph required. Quotes and trades read/write the chain with viem/wagmi.
 
-- Extract shared `hooks/` + `lib/` into `packages/suchmarket-core` to avoid duplication
-- Continue restyling trading components (`PoolDetails`, `Cart`, `CheckoutDialog`) beyond CSS overrides
+## Routes
+
+| Path | Purpose |
+|------|---------|
+| `/` | Home |
+| `/explore` | Browse pools |
+| `/pool/[chainId]/[address]` | Detail + buy/sell |
+| `/create` | Create pool |
+| `/launch` | Artist launch-with-pool |
+| `/my-pools` | Manage / deposit / params |
+| `/auctions` | Stub for auction house |
+| `/embed/pool/...` | Social embed card |
+| `/embed/collection/...` | Collection liquidity card |

@@ -30,7 +30,7 @@ Read the longform overview [here](https://blog.sudoswap.xyz/introducing-sudoswap
 This repository is organized as a [Turborepo](https://turbo.build/repo) monorepo with the following structure:
 
 - **`apps/miniapp`** - Farcaster miniapp for interacting with NFT liquidity pools (by mxjxn)
-- **`apps/suchmarket`** - Hyper-maximalist fine-art UI for the same LSSVM trading flows (parallel to miniapp)
+- **`apps/suchmarket`** - such.market — art-forward NFT AMM UI (pools, launch, embeds; auctions next)
 - **`apps/indexer`** - Graph Protocol subgraph for indexing pool creation and swap events (by mxjxn)
 - **`apps/docs`** - Documentation website deployed to GitHub Pages (by mxjxn)
 - **`packages/lssvm-contracts`** - Solidity contracts for the LSSVM protocol (from sudoswap)
