@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { Comic_Neue, Sora } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
+import { WordmarkFontSwitcher } from '@/components/WordmarkFontSwitcher'
 
 const comicNeue = Comic_Neue({
   subsets: ['latin'],
@@ -29,6 +31,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${comicNeue.variable} ${sora.variable}`}>
       <body className="font-sans min-h-screen flex flex-col bg-paper text-ink antialiased">
         <Providers>
+          <Suspense fallback={null}>
+            <WordmarkFontSwitcher />
+          </Suspense>
           <SiteHeader />
           <main className="flex-1">{children}</main>
           <SiteFooter />
