@@ -297,175 +297,139 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-600 text-sm">{error}</p>
+        <div className="rounded-md border border-clay/30 bg-clay/5 p-4">
+          <p className="text-clay text-sm">{error}</p>
         </div>
       )}
 
       {validationErrors.submit && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-600 text-sm">{validationErrors.submit}</p>
+        <div className="rounded-md border border-clay/30 bg-clay/5 p-4">
+          <p className="text-clay text-sm">{validationErrors.submit}</p>
         </div>
       )}
 
       {Object.keys(validationErrors).length > 0 && !validationErrors.submit && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-yellow-800 text-sm font-semibold mb-2">Please fix the following errors:</p>
+        <div className="rounded-md border border-line bg-mist/60 p-4">
+          <p className="text-ink text-sm font-medium mb-2">Please fix the following:</p>
           <ul className="list-disc list-inside space-y-1">
             {Object.entries(validationErrors).map(([field, message]) => (
-              <li key={field} className="text-yellow-700 text-sm">
-                <strong>{field}:</strong> {message}
+              <li key={field} className="text-mute text-sm">
+                <strong className="text-ink">{field}:</strong> {message}
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* NFT Type Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          NFT Type
-        </label>
-        <div className="grid grid-cols-2 gap-4">
+        <label className="sm-label">NFT type</label>
+        <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => updateField('nftType', 'ERC721')}
-            className={`px-4 py-3 rounded-lg border-2 transition-colors ${
-              formData.nftType === 'ERC721'
-                ? 'border-blue-500 bg-blue-50 text-blue-700'
-                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-            }`}
+            className={`sm-choice ${formData.nftType === 'ERC721' ? 'sm-choice-active' : ''}`}
           >
             ERC721
           </button>
           <button
             type="button"
             onClick={() => updateField('nftType', 'ERC1155')}
-            className={`px-4 py-3 rounded-lg border-2 transition-colors ${
-              formData.nftType === 'ERC1155'
-                ? 'border-blue-500 bg-blue-50 text-blue-700'
-                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-            }`}
+            className={`sm-choice ${formData.nftType === 'ERC1155' ? 'sm-choice-active' : ''}`}
           >
             ERC1155
           </button>
         </div>
       </div>
 
-      {/* Payment Token Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Payment Token
-        </label>
-        <div className="grid grid-cols-2 gap-4">
+        <label className="sm-label">Payment token</label>
+        <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => updateField('paymentToken', 'ETH')}
-            className={`px-4 py-3 rounded-lg border-2 transition-colors ${
-              formData.paymentToken === 'ETH'
-                ? 'border-blue-500 bg-blue-50 text-blue-700'
-                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-            }`}
+            className={`sm-choice ${formData.paymentToken === 'ETH' ? 'sm-choice-active' : ''}`}
           >
             ETH
           </button>
           <button
             type="button"
             onClick={() => updateField('paymentToken', 'ERC20')}
-            className={`px-4 py-3 rounded-lg border-2 transition-colors ${
-              formData.paymentToken === 'ERC20'
-                ? 'border-blue-500 bg-blue-50 text-blue-700'
-                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-            }`}
+            className={`sm-choice ${formData.paymentToken === 'ERC20' ? 'sm-choice-active' : ''}`}
           >
             ERC20
           </button>
         </div>
       </div>
 
-      {/* NFT Contract Address */}
       <div>
-        <label htmlFor="nftContract" className="block text-sm font-medium text-gray-700 mb-2">
-          NFT Contract Address *
+        <label htmlFor="nftContract" className="sm-label">
+          NFT contract address *
         </label>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
             id="nftContract"
             value={formData.nftContract}
             onChange={(e) => updateField('nftContract', e.target.value as Address)}
-            placeholder="0x..."
-            className={`flex-1 px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              validationErrors.nftContract ? 'border-red-500' : 'border-gray-300'
+            placeholder="0x…"
+            className={`sm-input font-mono text-xs flex-1 ${
+              validationErrors.nftContract ? 'border-clay' : ''
             }`}
           />
           {formData.nftContract && isAddress(formData.nftContract) && userAddress && factoryAddress && (
-            <div className="flex items-center">
+            <div className="flex items-center shrink-0">
               {isApproved ? (
-                <div className="flex items-center gap-2 px-4 py-2 text-green-600">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-sm font-medium">Approved</span>
-                </div>
+                <span className="text-sm text-forest px-2">Approved</span>
               ) : (
                 <button
                   type="button"
                   onClick={handleApprove}
                   disabled={isApproving || !isConnected}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    isApproving || !isConnected
-                      ? 'bg-gray-300 text-gray-700 cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
+                  className="sm-btn-secondary"
                 >
-                  {isApproving ? 'Approving...' : 'Approve'}
+                  {isApproving ? 'Approving…' : 'Approve'}
                 </button>
               )}
             </div>
           )}
         </div>
         {validationErrors.nftContract && (
-          <p className="mt-1 text-sm text-red-600">{validationErrors.nftContract}</p>
+          <p className="mt-1 text-sm text-clay">{validationErrors.nftContract}</p>
         )}
       </div>
 
-      {/* ERC20 Token Address (conditional) */}
       {formData.paymentToken === 'ERC20' && (
         <div>
-          <label htmlFor="erc20Token" className="block text-sm font-medium text-gray-700 mb-2">
-            ERC20 Token Address *
+          <label htmlFor="erc20Token" className="sm-label">
+            ERC20 token address *
           </label>
           <input
             type="text"
             id="erc20Token"
             value={formData.erc20Token || ''}
             onChange={(e) => updateField('erc20Token', e.target.value as Address)}
-            placeholder="0x..."
-            className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              validationErrors.erc20Token ? 'border-red-500' : 'border-gray-300'
+            placeholder="0x…"
+            className={`sm-input font-mono text-xs ${
+              validationErrors.erc20Token ? 'border-clay' : ''
             }`}
           />
           {validationErrors.erc20Token && (
-            <p className="mt-1 text-sm text-red-600">{validationErrors.erc20Token}</p>
+            <p className="mt-1 text-sm text-clay">{validationErrors.erc20Token}</p>
           )}
-          {erc20Symbol && (
-            <p className="mt-1 text-sm text-gray-500">Token: {erc20Symbol}</p>
-          )}
+          {erc20Symbol && <p className="mt-1 text-sm text-mute">Token: {erc20Symbol}</p>}
         </div>
       )}
 
-      {/* Bonding Curve Selection */}
       {hasBondingCurves && (
         <div>
-          <label htmlFor="bondingCurve" className="block text-sm font-medium text-gray-700 mb-2">
-            Bonding Curve *
+          <label htmlFor="bondingCurve" className="sm-label">
+            Bonding curve *
           </label>
           <select
             id="bondingCurve"
             value={formData.bondingCurve}
             onChange={(e) => updateField('bondingCurve', e.target.value as CreatePoolFormData['bondingCurve'])}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="sm-input"
           >
             <option value="LINEAR">Linear</option>
             <option value="EXPONENTIAL">Exponential</option>
@@ -475,10 +439,9 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
         </div>
       )}
 
-      {/* Spot Price */}
       <div>
-        <label htmlFor="spotPrice" className="block text-sm font-medium text-gray-700 mb-2">
-          Spot Price ({formData.paymentToken === 'ETH' ? 'ETH' : erc20Symbol || 'Tokens'}) *
+        <label htmlFor="spotPrice" className="sm-label">
+          Spot price ({formData.paymentToken === 'ETH' ? 'ETH' : erc20Symbol || 'Tokens'}) *
         </label>
         <input
           type="number"
@@ -487,18 +450,15 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
           value={formData.spotPrice}
           onChange={(e) => updateField('spotPrice', e.target.value)}
           placeholder="0.002"
-          className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-            validationErrors.spotPrice ? 'border-red-500' : 'border-gray-300'
-          }`}
+          className={`sm-input ${validationErrors.spotPrice ? 'border-clay' : ''}`}
         />
         {validationErrors.spotPrice && (
-          <p className="mt-1 text-sm text-red-600">{validationErrors.spotPrice}</p>
+          <p className="mt-1 text-sm text-clay">{validationErrors.spotPrice}</p>
         )}
       </div>
 
-      {/* Delta */}
       <div>
-        <label htmlFor="delta" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="delta" className="sm-label">
           Delta ({formData.paymentToken === 'ETH' ? 'ETH' : erc20Symbol || 'Tokens'}) *
         </label>
         <input
@@ -508,19 +468,16 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
           value={formData.delta}
           onChange={(e) => updateField('delta', e.target.value)}
           placeholder="0.01"
-          className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-            validationErrors.delta ? 'border-red-500' : 'border-gray-300'
-          }`}
+          className={`sm-input ${validationErrors.delta ? 'border-clay' : ''}`}
         />
         {validationErrors.delta && (
-          <p className="mt-1 text-sm text-red-600">{validationErrors.delta}</p>
+          <p className="mt-1 text-sm text-clay">{validationErrors.delta}</p>
         )}
-        <p className="mt-1 text-xs text-gray-500">Price adjustment per trade</p>
+        <p className="mt-1 text-xs text-soft">Price adjustment per trade</p>
       </div>
 
-      {/* Fee */}
       <div>
-        <label htmlFor="fee" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="fee" className="sm-label">
           Fee (basis points) *
         </label>
         <input
@@ -530,20 +487,17 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
           value={formData.fee}
           onChange={(e) => updateField('fee', e.target.value)}
           placeholder="100"
-          className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-            validationErrors.fee ? 'border-red-500' : 'border-gray-300'
-          }`}
+          className={`sm-input ${validationErrors.fee ? 'border-clay' : ''}`}
         />
         {validationErrors.fee && (
-          <p className="mt-1 text-sm text-red-600">{validationErrors.fee}</p>
+          <p className="mt-1 text-sm text-clay">{validationErrors.fee}</p>
         )}
-        <p className="mt-1 text-xs text-gray-500">100 = 1%, 1000 = 10%</p>
+        <p className="mt-1 text-xs text-soft">100 = 1%, 1000 = 10%</p>
       </div>
 
-      {/* ERC721: Initial NFT IDs */}
       {formData.nftType === 'ERC721' && (
         <div>
-          <label htmlFor="initialNFTIds" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="initialNFTIds" className="sm-label">
             Initial NFT IDs (comma-separated) *
           </label>
           <input
@@ -552,21 +506,20 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
             value={formData.initialNFTIds}
             onChange={(e) => updateField('initialNFTIds', e.target.value)}
             placeholder="1, 2, 3"
-            className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              validationErrors.initialNFTIds ? 'border-red-500' : 'border-gray-300'
+            className={`sm-input font-mono text-xs ${
+              validationErrors.initialNFTIds ? 'border-clay' : ''
             }`}
           />
           {validationErrors.initialNFTIds && (
-            <p className="mt-1 text-sm text-red-600">{validationErrors.initialNFTIds}</p>
+            <p className="mt-1 text-sm text-clay">{validationErrors.initialNFTIds}</p>
           )}
         </div>
       )}
 
-      {/* ERC1155: NFT ID and Initial Balance */}
       {formData.nftType === 'ERC1155' && (
         <>
           <div>
-            <label htmlFor="nftId" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="nftId" className="sm-label">
               NFT ID *
             </label>
             <input
@@ -575,35 +528,28 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
               value={formData.nftId}
               onChange={(e) => updateField('nftId', e.target.value)}
               placeholder="0"
-              className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                validationErrors.nftId ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`sm-input ${validationErrors.nftId ? 'border-clay' : ''}`}
             />
             {validationErrors.nftId && (
-              <p className="mt-1 text-sm text-red-600">{validationErrors.nftId}</p>
+              <p className="mt-1 text-sm text-clay">{validationErrors.nftId}</p>
             )}
             {isDebouncing && formData.nftId && (
-              <p className="mt-1 text-xs text-gray-500">Waiting for input to stop...</p>
+              <p className="mt-1 text-xs text-soft">Waiting for input…</p>
             )}
           </div>
 
-          {/* Token Info Display */}
           {formData.nftId && (loadingTokenInfo || tokenInfo) && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <div className="rounded-md border border-line bg-mist/40 p-4">
               {loadingTokenInfo ? (
-                <div className="flex items-center gap-3">
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-300 border-t-blue-600"></div>
-                  <p className="text-sm text-gray-600">Loading token info...</p>
-                </div>
+                <p className="text-sm text-mute">Loading token info…</p>
               ) : tokenInfo ? (
                 <div className="space-y-3">
-                  {/* Image */}
                   {tokenInfo.metadata?.image && (
                     <div className="w-full max-w-xs mx-auto">
                       <img
                         src={tokenInfo.metadata.image}
                         alt={tokenInfo.metadata.name || `Token #${formData.nftId}`}
-                        className="w-full h-auto rounded-lg border border-gray-200"
+                        className="w-full h-auto rounded-md border border-line"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
                           target.style.display = 'none'
@@ -611,38 +557,30 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
                       />
                     </div>
                   )}
-
-                  {/* Title */}
                   {tokenInfo.metadata?.name ? (
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">{tokenInfo.metadata.name}</p>
-                    </div>
+                    <p className="text-sm font-medium text-ink">{tokenInfo.metadata.name}</p>
                   ) : (
                     <div>
-                      <p className="text-sm font-semibold text-gray-900">Token ID: #{formData.nftId}</p>
-                      <p className="text-xs text-gray-500 mt-1">Metadata not available for this token</p>
+                      <p className="text-sm font-medium text-ink">Token ID: #{formData.nftId}</p>
+                      <p className="text-xs text-soft mt-1">Metadata not available</p>
                     </div>
                   )}
-
-                  {/* Balance */}
-                  <div className="flex items-center justify-between pt-2 border-t border-gray-200">
-                    <span className="text-sm text-gray-600">Your Balance:</span>
-                    <span className="text-sm font-semibold text-gray-900">
+                  <div className="flex items-center justify-between pt-2 border-t border-line">
+                    <span className="text-sm text-mute">Your balance</span>
+                    <span className="text-sm font-medium text-ink">
                       {tokenInfo.balance.toString()}
                     </span>
                   </div>
-
                   {tokenInfo.balance === 0n && (
-                    <p className="text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 rounded p-2">
+                    <p className="text-xs text-warn bg-mist border border-line rounded-md p-2">
                       You don&apos;t own any of this token. Make sure you have the correct token ID.
                     </p>
                   )}
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-600">Could not fetch token info.</p>
-                  <p className="text-xs text-gray-500">
-                    The token ID might be invalid, or the contract might not support metadata queries. 
+                  <p className="text-sm text-mute">Could not fetch token info.</p>
+                  <p className="text-xs text-soft">
                     You can still proceed if you know the token ID is correct.
                   </p>
                 </div>
@@ -651,8 +589,8 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
           )}
 
           <div>
-            <label htmlFor="initialNFTBalance" className="block text-sm font-medium text-gray-700 mb-2">
-              Initial NFT Balance *
+            <label htmlFor="initialNFTBalance" className="sm-label">
+              Initial NFT balance *
             </label>
             <input
               type="number"
@@ -660,18 +598,16 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
               step="1"
               value={formData.initialNFTBalance}
               onChange={(e) => updateField('initialNFTBalance', e.target.value)}
-              placeholder={tokenInfo ? tokenInfo.balance.toString() : "10"}
+              placeholder={tokenInfo ? tokenInfo.balance.toString() : '10'}
               min="1"
               max={tokenInfo ? tokenInfo.balance.toString() : undefined}
-              className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                validationErrors.initialNFTBalance ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`sm-input ${validationErrors.initialNFTBalance ? 'border-clay' : ''}`}
             />
             {validationErrors.initialNFTBalance && (
-              <p className="mt-1 text-sm text-red-600">{validationErrors.initialNFTBalance}</p>
+              <p className="mt-1 text-sm text-clay">{validationErrors.initialNFTBalance}</p>
             )}
             {tokenInfo && tokenInfo.balance > 0n && (
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-soft">
                 Maximum: {tokenInfo.balance.toString()} (your balance)
               </p>
             )}
@@ -679,11 +615,10 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
         </>
       )}
 
-      {/* ERC20: Initial Token Balance */}
       {formData.paymentToken === 'ERC20' && (
         <div>
-          <label htmlFor="initialTokenBalance" className="block text-sm font-medium text-gray-700 mb-2">
-            Initial Token Balance ({erc20Symbol || 'Tokens'})
+          <label htmlFor="initialTokenBalance" className="sm-label">
+            Initial token balance ({erc20Symbol || 'Tokens'})
           </label>
           <input
             type="number"
@@ -692,31 +627,27 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
             value={formData.initialTokenBalance}
             onChange={(e) => updateField('initialTokenBalance', e.target.value)}
             placeholder="0"
-            className={`w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              validationErrors.initialTokenBalance ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`sm-input ${validationErrors.initialTokenBalance ? 'border-clay' : ''}`}
           />
           {validationErrors.initialTokenBalance && (
-            <p className="mt-1 text-sm text-red-600">{validationErrors.initialTokenBalance}</p>
+            <p className="mt-1 text-sm text-clay">{validationErrors.initialTokenBalance}</p>
           )}
         </div>
       )}
 
-      {/* Submit Button */}
       <div>
         <button
           type="submit"
           disabled={isSubmitting || !isConnected}
-          className={`w-full px-6 py-3 rounded-lg font-semibold transition-colors ${
-            isSubmitting || !isConnected
-              ? 'bg-gray-300 text-gray-700 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
-          }`}
+          className="sm-btn-primary w-full disabled:opacity-40"
         >
-          {isSubmitting ? 'Creating Pool...' : isConnected ? 'Create Pool' : 'Connect Wallet to Continue'}
+          {isSubmitting
+            ? 'Creating pool…'
+            : isConnected
+              ? 'Create pool'
+              : 'Connect wallet to continue'}
         </button>
       </div>
     </form>
   )
 }
-

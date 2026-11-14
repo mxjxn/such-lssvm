@@ -1,87 +1,56 @@
 'use client'
 
-import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import { Suspense } from 'react'
 import { useAppChain } from '@/contexts/ChainContext'
-import { getChainName } from '@/lib/chains'
+import { PoolListItem } from '@/components/PoolListCard'
+import { HomePoolsSection } from '@/components/home/HomePoolsSection'
+import { HomeListingsSection } from '@/components/home/HomeListingsSection'
+import { isHomePreviewMode } from '@/lib/homeFixtures'
 
-export default function HomePage() {
+async function fetchPools(chainId: number) {
+  const params = new URLSearchParams({ chainId: String(chainId), lookback: '80000' })
+  const res = await fetch(`/api/pools?${params}`)
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.details || err.error || 'Failed to load pools')
+  }
+  return res.json() as Promise<{ pools: PoolListItem[] }>
+}
+
+function HomeContent() {
   const { chainId } = useAppChain()
+  const searchParams = useSearchParams()
+  const preview = isHomePreviewMode(searchParams.get('preview'))
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['homePools', chainId],
+    queryFn: () => fetchPools(chainId),
+  })
 
   return (
     <div>
-      {/* Hero — one composition, brand first */}
-      <section className="relative overflow-hidden border-b border-line">
-        <div
-          className="absolute inset-0 opacity-70"
-          aria-hidden
-          style={{
-            backgroundImage:
-              'radial-gradient(ellipse 80% 60% at 70% 20%, rgba(44,95,79,0.12), transparent), radial-gradient(ellipse 50% 40% at 10% 80%, rgba(166,93,78,0.08), transparent)',
-          }}
-        />
-        <div className="sm-container relative py-16 md:py-24 max-w-3xl">
-          <p className="font-display text-4xl md:text-6xl tracking-tight text-ink leading-[1.05]">
-            such.market
-          </p>
-          <h1 className="mt-4 text-lg md:text-xl text-mute font-normal max-w-xl leading-relaxed">
-            A quiet gallery for NFT liquidity. Buy and sell on a curve — always open, no auction clock.
-          </h1>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/explore" className="sm-btn-primary">
-              Explore pools
-            </Link>
-            <Link href="/create" className="sm-btn-secondary">
-              Create a pool
-            </Link>
-          </div>
-          <p className="mt-6 text-xs text-soft">
-            Live on {getChainName(chainId)}. Ethereum support later. Auctions will join this home.
-          </p>
-        </div>
-      </section>
-
-      <section className="sm-container py-14 grid md:grid-cols-3 gap-8">
-        <Feature
-          title="Pools, not listings"
-          body="Each pool holds art and/or ETH on a bonding curve. Price moves a little with every trade so the market stays liquid both ways."
-        />
-        <Feature
-          title="Trade on the curve"
-          body="Buy and sell without an auction clock. Spot price moves with each trade so liquidity stays available both ways."
-        />
-        <Feature
-          title="Built for the ecosystem"
-          body="cryptoart.studio is where artists manage contracts and launches. cryptoart.social embeds market cards. such.market is marketplace sales — auctions next."
-        />
-      </section>
-
-      <section className="border-t border-line bg-mist/40">
-        <div className="sm-container py-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div>
-            <h2 className="font-display text-2xl text-ink">Start with a pool</h2>
-            <p className="mt-2 text-sm text-mute max-w-md">
-              Anyone with NFTs or tokens can create a buy, sell, or trade pool. Linear curve at launch.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/create" className="sm-btn-primary">
-              Create pool
-            </Link>
-            <Link href="/my-pools" className="sm-btn-secondary">
-              My pools
-            </Link>
-          </div>
-        </div>
-      </section>
+      <HomePoolsSection
+        chainId={chainId}
+        pools={data?.pools ?? []}
+        isLoading={isLoading}
+        error={error as Error | null}
+        preview={preview}
+      />
+      <HomeListingsSection preview={preview} />
     </div>
   )
 }
 
-function Feature({ title, body }: { title: string; body: string }) {
+export default function HomePage() {
   return (
-    <div>
-      <h2 className="font-display text-xl text-ink">{title}</h2>
-      <p className="mt-2 text-sm text-mute leading-relaxed">{body}</p>
-    </div>
+    <Suspense
+      fallback={
+        <div className="sm-container py-16 text-sm text-mute">Loading market…</div>
+      }
+    >
+      <HomeContent />
+    </Suspense>
   )
 }
