@@ -634,7 +634,7 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
 
                   {tokenInfo.balance === 0n && (
                     <p className="text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 rounded p-2">
-                      You don't own any of this token. Make sure you have the correct token ID.
+                      You don&apos;t own any of this token. Make sure you have the correct token ID.
                     </p>
                   )}
                 </div>

@@ -21,8 +21,8 @@ export function SiteFooter() {
           <Link href="/explore" className="hover:text-ink">
             Explore
           </Link>
-          <Link href="/launch" className="hover:text-ink">
-            Launch with a pool
+          <Link href="/create" className="hover:text-ink">
+            Create pool
           </Link>
           <Link href="/auctions" className="hover:text-ink">
             Auctions

@@ -182,30 +182,10 @@ export function PoolDetails({
 
       <div className="flex gap-2">
         <Link
-          href={`/sell/${chainId}/${poolAddress}`}
+          href={`/pool/${chainId}/${poolAddress}`}
           className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-semibold text-sm"
-          onClick={(e) => {
-            // DEBUG: Log what we're trying to navigate to
-            console.log('=== POOL DETAILS: SELL CLICKED ===')
-            console.log('chainId:', chainId, 'type:', typeof chainId)
-            console.log('poolAddress:', poolAddress, 'type:', typeof poolAddress)
-            console.log('Link href:', `/sell/${chainId}/${poolAddress}`)
-            console.log('Current URL:', typeof window !== 'undefined' ? window.location.href : 'N/A')
-            
-            // Store pool data in sessionStorage as fallback for mini-app navigation issues
-            if (typeof window !== 'undefined') {
-              const dataToStore = {
-                chainId,
-                poolAddress,
-              }
-              console.log('Storing in sessionStorage:', dataToStore)
-              sessionStorage.setItem('lastPoolData', JSON.stringify(dataToStore))
-              console.log('Stored successfully')
-            }
-            console.log('=================================')
-          }}
         >
-          Sell NFTs
+          Trade
         </Link>
       </div>
     </div>

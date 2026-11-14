@@ -11,7 +11,7 @@ export default function AuctionsPage() {
       <h1 className="font-display text-3xl md:text-4xl text-ink">Auctions</h1>
       <p className="mt-4 text-mute text-sm leading-relaxed">
         The auction house will live here alongside bonding-curve pools — one sales home for the
-        cryptoart ecosystem. Timed lots, English auctions, and studio launch paths will share this
+        cryptoart ecosystem. Timed lots and English auctions will share this
         nav.
       </p>
       <Link href="/explore" className="sm-btn-primary inline-flex mt-8">

@@ -9,7 +9,6 @@ import { useAppChain } from '@/contexts/ChainContext'
 const NAV = [
   { href: '/explore', label: 'Explore' },
   { href: '/create', label: 'Create pool' },
-  { href: '/launch', label: 'Launch' },
   { href: '/my-pools', label: 'My pools' },
   { href: '/auctions', label: 'Auctions', soon: true },
 ]

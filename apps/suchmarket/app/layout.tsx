@@ -20,7 +20,7 @@ const sora = Sora({
 export const metadata: Metadata = {
   title: 'such.market — NFT AMM pools',
   description:
-    'Buy and sell cryptoart on bonding-curve liquidity pools. Create pools, launch collections, and stay liquid on Base.',
+    'Buy and sell cryptoart on bonding-curve liquidity pools. Create pools, trade on the curve, and stay liquid on Base.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -6,7 +6,6 @@ import { CreatePoolForm, CreatePoolFormData } from '@/components/CreatePoolForm'
 import { useCreatePool } from '@/hooks/useCreatePool'
 import { useAppChain } from '@/contexts/ChainContext'
 import { LAUNCH_CURVE, getChainName } from '@/lib/chains'
-import Link from 'next/link'
 
 export default function CreatePoolPage() {
   const { chainId } = useAppChain()
@@ -27,12 +26,8 @@ export default function CreatePoolPage() {
         <p className="mt-2 text-sm text-mute leading-relaxed">
           Open a buy, sell, or trade pool on {getChainName(chainId)}. Default curve:{' '}
           <strong>{LAUNCH_CURVE}</strong>. More curves and Ethereum can be enabled later.
-        </p>
-        <p className="mt-3 text-sm">
-          <Link href="/launch" className="text-forest hover:underline">
-            Launching a collection?
-          </Link>{' '}
-          Use the guided artist flow.
+          Artist contract launches and collection setup live in cryptoart.studio — this form is for
+          marketplace pool creation.
         </p>
       </header>
       <div className="sm-card p-6">

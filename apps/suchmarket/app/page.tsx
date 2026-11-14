@@ -30,8 +30,8 @@ export default function HomePage() {
             <Link href="/explore" className="sm-btn-primary">
               Explore pools
             </Link>
-            <Link href="/launch" className="sm-btn-secondary">
-              Launch a collection
+            <Link href="/create" className="sm-btn-secondary">
+              Create a pool
             </Link>
           </div>
           <p className="mt-6 text-xs text-soft">
@@ -46,12 +46,12 @@ export default function HomePage() {
           body="Each pool holds art and/or ETH on a bonding curve. Price moves a little with every trade so the market stays liquid both ways."
         />
         <Feature
-          title="Made for artists"
-          body="Launch a collection straight into a trade pool — collectors buy from the curve, can sell back, and you earn fees while liquidity remains."
+          title="Trade on the curve"
+          body="Buy and sell without an auction clock. Spot price moves with each trade so liquidity stays available both ways."
         />
         <Feature
           title="Built for the ecosystem"
-          body="cryptoart.studio manages contracts. cryptoart.social embeds market cards. such.market is where sales live — auctions next."
+          body="cryptoart.studio is where artists manage contracts and launches. cryptoart.social embeds market cards. such.market is marketplace sales — auctions next."
         />
       </section>
 

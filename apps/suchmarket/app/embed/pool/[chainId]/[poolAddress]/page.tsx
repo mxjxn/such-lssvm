@@ -17,14 +17,14 @@ export default function EmbedPoolCard() {
     10
   )
   const poolRaw = Array.isArray(params.poolAddress) ? params.poolAddress[0] : params.poolAddress
-
-  if (!isSupportedChainId(chainId) || !poolRaw || !isAddress(poolRaw)) {
-    return <div className="p-4 text-xs text-mute">Invalid embed</div>
-  }
-
-  const poolAddress = getAddress(poolRaw) as Address
+  const valid =
+    isSupportedChainId(chainId) && typeof poolRaw === 'string' && isAddress(poolRaw)
+  const poolAddress = valid ? (getAddress(poolRaw) as Address) : undefined
   const { data: pool, isLoading, error } = usePoolData(poolAddress, chainId)
 
+  if (!valid || !poolAddress) {
+    return <div className="p-4 text-xs text-mute">Invalid embed</div>
+  }
   if (isLoading) {
     return <div className="p-4 text-xs text-mute animate-pulse">Loading…</div>
   }

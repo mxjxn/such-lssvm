@@ -18,21 +18,16 @@ export default function PoolDetailPage() {
   const chainIdRaw = Array.isArray(params.chainId) ? params.chainId[0] : params.chainId
   const poolRaw = Array.isArray(params.poolAddress) ? params.poolAddress[0] : params.poolAddress
   const chainId = parseInt(chainIdRaw || '8453', 10)
-
-  if (!isSupportedChainId(chainId) || !poolRaw || !isAddress(poolRaw)) {
-    return (
-      <div className="sm-container py-16 text-center text-mute text-sm">Invalid pool link.</div>
-    )
-  }
-
-  const poolAddress = getAddress(poolRaw) as Address
+  const valid =
+    isSupportedChainId(chainId) && typeof poolRaw === 'string' && isAddress(poolRaw)
+  const poolAddress = valid ? (getAddress(poolRaw) as Address) : undefined
   const { data: pool, isLoading, error } = usePoolData(poolAddress, chainId)
   const [isERC1155, setIsERC1155] = useState(false)
   const [poolNftId, setPoolNftId] = useState<bigint | null>(null)
   const [owner, setOwner] = useState<Address | null>(null)
 
   useEffect(() => {
-    if (!pool) return
+    if (!pool || !poolAddress) return
     const client = getPublicClient(chainId)
     ;(async () => {
       try {
@@ -66,6 +61,12 @@ export default function PoolDetailPage() {
       }
     })()
   }, [pool, poolAddress, chainId])
+
+  if (!valid || !poolAddress) {
+    return (
+      <div className="sm-container py-16 text-center text-mute text-sm">Invalid pool link.</div>
+    )
+  }
 
   if (isLoading) {
     return <div className="sm-container py-16 text-center text-mute text-sm">Loading pool…</div>

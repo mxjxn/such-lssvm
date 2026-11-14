@@ -1,22 +1,16 @@
 'use client'
 
-import { usePathname, useRouter, useParams } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 export function TopNav() {
   const pathname = usePathname()
   const router = useRouter()
-  const params = useParams()
 
   const getBackDestination = () => {
-    if (pathname.startsWith('/buy/') || pathname.startsWith('/sell/')) {
-      const chainId = params.chainId as string
-      const poolAddress = params.poolAddress as string
-      return `/pool/${chainId}/${poolAddress}`
-    }
     if (pathname.startsWith('/pool/')) {
       return '/'
     }
-    if (pathname.startsWith('/browse/') || pathname.startsWith('/pools/') || pathname.startsWith('/create/')) {
+    if (pathname.startsWith('/browse/') || pathname.startsWith('/pools/') || pathname.startsWith('/create')) {
       return '/'
     }
     return null
