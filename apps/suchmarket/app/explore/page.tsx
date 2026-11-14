@@ -65,6 +65,7 @@ function ExploreContent() {
   const pools = showSamples ? SAMPLE_POOLS : data?.pools ?? []
 
   return (
+    <div className="sm-band-orange min-h-full">
     <div className="sm-container py-10">
       <header className="max-w-2xl mb-10">
         <h1 className="sm-heading text-3xl md:text-4xl">Explore</h1>
@@ -140,6 +141,7 @@ function ExploreContent() {
           ))}
         </div>
       )}
+    </div>
     </div>
   )
 }

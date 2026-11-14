@@ -27,6 +27,11 @@ module.exports = {
         'forest-deep': '#c2410c',
         clay: '#b91c1c',
         warn: '#b45309',
+        band: {
+          orange: '#ffedd5',
+          sky: '#dbeafe',
+          cream: '#fff7ed',
+        },
       },
       fontFamily: {
         display: ['var(--font-comic)', 'Comic Neue', 'cursive'],

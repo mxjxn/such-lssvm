@@ -87,6 +87,7 @@ export default function PoolDetailPage() {
   const curveType = getCurveType(chainId, pool.bondingCurve)
 
   return (
+    <div className="sm-band-sky min-h-full">
     <div className="sm-container py-8 md:py-12">
       <div className="mb-6 flex flex-wrap items-center gap-2 text-xs text-soft">
         <Link href="/explore" className="hover:text-ink">
@@ -170,6 +171,7 @@ export default function PoolDetailPage() {
           />
         </div>
       </div>
+    </div>
     </div>
   )
 }

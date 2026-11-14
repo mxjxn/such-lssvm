@@ -44,6 +44,7 @@ export default function MyPoolsPage() {
 
   if (!isConnected || !address) {
     return (
+      <div className="sm-band-orange min-h-full">
       <div className="sm-container py-16 max-w-md text-center space-y-4">
         <h1 className="sm-heading text-3xl">My pools</h1>
         <p className="text-sm text-mute">Connect your wallet to manage pools you own.</p>
@@ -51,12 +52,14 @@ export default function MyPoolsPage() {
           <WalletButton />
         </div>
       </div>
+      </div>
     )
   }
 
   const manage = selected as Address | null
 
   return (
+    <div className="sm-band-orange min-h-full">
     <div className="sm-container py-10">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
@@ -234,6 +237,7 @@ export default function MyPoolsPage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   )
 }

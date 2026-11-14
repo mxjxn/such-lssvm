@@ -6,6 +6,7 @@ import Link from 'next/link'
  */
 export default function AuctionsPage() {
   return (
+    <div className="sm-band-sky min-h-full">
     <div className="sm-container py-16 max-w-xl">
       <p className="sm-play text-sm text-sky-deep mb-2">Coming soon</p>
       <h1 className="sm-heading text-3xl md:text-4xl">Auctions</h1>
@@ -16,6 +17,7 @@ export default function AuctionsPage() {
       <Link href="/explore" className="sm-btn-primary inline-flex mt-8">
         Explore pools meanwhile
       </Link>
+    </div>
     </div>
   )
 }

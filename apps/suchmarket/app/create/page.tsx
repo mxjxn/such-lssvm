@@ -20,6 +20,7 @@ export default function CreatePoolPage() {
   }, [isSuccess, poolAddress, chainId, router])
 
   return (
+    <div className="sm-band-sky min-h-full">
     <div className="sm-container py-10 max-w-2xl">
       <header className="mb-8">
         <h1 className="sm-heading text-3xl md:text-4xl">Create a pool</h1>
@@ -41,6 +42,7 @@ export default function CreatePoolPage() {
           <p className="mt-4 text-sm text-forest">Pool created — opening detail…</p>
         )}
       </div>
+    </div>
     </div>
   )
 }

@@ -33,7 +33,8 @@ export function HomeListingsSection({ preview }: { preview: boolean }) {
   const auctions = preview ? SAMPLE_AUCTIONS : []
 
   return (
-    <section className="sm-container py-10 md:py-14">
+    <section className="sm-band-sky border-b-2 border-line">
+      <div className="sm-container py-10 md:py-14">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10">
         <div className="lg:col-span-3">
           <div className="flex items-end justify-between gap-4 mb-5">
@@ -110,6 +111,7 @@ export function HomeListingsSection({ preview }: { preview: boolean }) {
             </ul>
           </div>
         </div>
+      </div>
       </div>
     </section>
   )

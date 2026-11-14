@@ -21,13 +21,13 @@ export function HomePoolsSection({
   const items = showSamples ? SAMPLE_POOLS : pools
 
   return (
-    <section className="relative overflow-hidden border-b-2 border-line">
+    <section className="sm-band-orange relative overflow-hidden border-b-2 border-line">
       <div
-        className="absolute inset-0 opacity-80 pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         aria-hidden
         style={{
           backgroundImage:
-            'radial-gradient(ellipse 70% 50% at 90% 0%, rgba(37,99,235,0.14), transparent), radial-gradient(ellipse 45% 40% at 0% 100%, rgba(234,88,12,0.16), transparent)',
+            'radial-gradient(ellipse 55% 50% at 95% 10%, rgba(37,99,235,0.28), transparent), radial-gradient(circle at 8% 80%, rgba(234,88,12,0.35), transparent 45%)',
         }}
       />
       <div className="sm-container relative py-10 md:py-14">

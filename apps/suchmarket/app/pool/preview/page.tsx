@@ -16,6 +16,7 @@ export default function PoolPreviewPage() {
   const delta = formatEth(BigInt(p.delta))
 
   return (
+    <div className="sm-band-sky min-h-full">
     <div className="sm-container py-8 md:py-12">
       <p className="sm-play text-sm text-sky-deep mb-4">
         Sample pool · preview mode — not on-chain
@@ -91,6 +92,7 @@ export default function PoolPreviewPage() {
           </Link>
         </div>
       </div>
+    </div>
     </div>
   )
 }

@@ -20,6 +20,16 @@
   --sky-deep: #1d4ed8;
   --clay: #b91c1c;
   --warn: #b45309;
+  /* shell chrome — bold brand fills (not white) */
+  --header-from: #c2410c;
+  --header-to: #1d4ed8;
+  --header-fg: #ffffff;
+  --header-muted: rgba(255, 255, 255, 0.82);
+  --footer-from: #1d4ed8;
+  --footer-to: #9a3412;
+  --band-orange: #ffedd5;
+  --band-sky: #dbeafe;
+  --band-cream: #fff7ed;
   /* legacy aliases used across components */
   --forest: var(--orange);
   --forest-deep: var(--orange-deep);
@@ -39,8 +49,9 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    radial-gradient(ellipse 80% 50% at 100% -10%, rgba(37, 99, 235, 0.12), transparent),
-    radial-gradient(ellipse 60% 40% at -10% 100%, rgba(234, 88, 12, 0.14), transparent),
+    radial-gradient(ellipse 90% 55% at 100% -5%, rgba(37, 99, 235, 0.22), transparent),
+    radial-gradient(ellipse 70% 45% at -5% 30%, rgba(234, 88, 12, 0.2), transparent),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(253, 186, 116, 0.35), transparent),
     var(--paper);
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -130,5 +141,32 @@ a {
   .sm-heading {
     font-family: var(--font-comic), 'Comic Neue', cursive;
     @apply text-ink tracking-tight;
+  }
+
+  .sm-header-bar {
+    background: linear-gradient(105deg, var(--header-from) 0%, #ea580c 42%, var(--header-to) 100%);
+    color: var(--header-fg);
+  }
+
+  .sm-footer-bar {
+    background: linear-gradient(120deg, var(--footer-from) 0%, #1e3a8a 45%, var(--footer-to) 100%);
+    color: var(--header-fg);
+  }
+
+  .sm-band-orange {
+    background: linear-gradient(180deg, var(--band-orange) 0%, var(--band-cream) 100%);
+  }
+
+  .sm-band-sky {
+    background: linear-gradient(180deg, var(--band-sky) 0%, var(--band-cream) 100%);
+  }
+
+  .sm-btn-on-brand {
+    @apply sm-btn rounded-xl border-2 border-white/90 bg-white text-orange-deep hover:bg-mist disabled:cursor-not-allowed disabled:opacity-40;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .sm-btn-on-brand-ghost {
+    @apply sm-btn rounded-xl border-2 border-white/50 bg-white/10 text-white hover:bg-white/20;
   }
 }
