@@ -20,15 +20,20 @@
   --sky-deep: #1d4ed8;
   --clay: #b91c1c;
   --warn: #b45309;
-  /* shell chrome — bold brand fills (not white) */
+  /*
+    Gradients stay within one hue family — never blend orange↔blue.
+    Header = orange family; footer = cobalt family; bands = same-hue only.
+  */
   --header-from: #c2410c;
-  --header-to: #1d4ed8;
+  --header-to: #ea580c; /* warmer/lighter orange, same hue */
   --header-fg: #ffffff;
   --header-muted: rgba(255, 255, 255, 0.82);
-  --footer-from: #1d4ed8;
-  --footer-to: #9a3412;
+  --footer-from: #1e3a8a;
+  --footer-to: #2563eb; /* brighter blue, same hue */
   --band-orange: #ffedd5;
-  --band-sky: #dbeafe;
+  --band-orange-end: #fff7ed; /* warm cream, orange family */
+  --band-sky: #bfdbfe;
+  --band-sky-end: #eff6ff; /* lighter blue, not cream */
   --band-cream: #fff7ed;
   /* legacy aliases used across components */
   --forest: var(--orange);
@@ -48,10 +53,10 @@ html {
 body {
   margin: 0;
   color: var(--ink);
+  /* orange-family atmosphere only — blue shows up as solid accent blocks */
   background:
-    radial-gradient(ellipse 90% 55% at 100% -5%, rgba(37, 99, 235, 0.22), transparent),
-    radial-gradient(ellipse 70% 45% at -5% 30%, rgba(234, 88, 12, 0.2), transparent),
-    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(253, 186, 116, 0.35), transparent),
+    radial-gradient(ellipse 70% 45% at -5% 20%, rgba(234, 88, 12, 0.18), transparent),
+    radial-gradient(ellipse 55% 40% at 80% 100%, rgba(253, 186, 116, 0.4), transparent),
     var(--paper);
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -82,12 +87,12 @@ a {
 
   .sm-btn-primary {
     @apply sm-btn bg-orange-deep text-white hover:bg-orange disabled:cursor-not-allowed disabled:opacity-40;
-    box-shadow: 0 3px 0 var(--sky-deep);
+    box-shadow: 0 3px 0 #9a3412; /* darker orange, same hue */
   }
 
   .sm-btn-primary:hover:not(:disabled) {
     transform: translateY(1px);
-    box-shadow: 0 2px 0 var(--sky-deep);
+    box-shadow: 0 2px 0 #9a3412;
   }
 
   .sm-btn-secondary {
@@ -144,21 +149,23 @@ a {
   }
 
   .sm-header-bar {
-    background: linear-gradient(105deg, var(--header-from) 0%, #ea580c 42%, var(--header-to) 100%);
+    /* bold orange; subtle same-hue lift only */
+    background: linear-gradient(180deg, var(--header-to) 0%, var(--header-from) 100%);
     color: var(--header-fg);
   }
 
   .sm-footer-bar {
-    background: linear-gradient(120deg, var(--footer-from) 0%, #1e3a8a 45%, var(--footer-to) 100%);
+    /* solid-ish cobalt; subtle same-hue only — not orange */
+    background: linear-gradient(180deg, var(--footer-to) 0%, var(--footer-from) 100%);
     color: var(--header-fg);
   }
 
   .sm-band-orange {
-    background: linear-gradient(180deg, var(--band-orange) 0%, var(--band-cream) 100%);
+    background: linear-gradient(180deg, var(--band-orange) 0%, var(--band-orange-end) 100%);
   }
 
   .sm-band-sky {
-    background: linear-gradient(180deg, var(--band-sky) 0%, var(--band-cream) 100%);
+    background: linear-gradient(180deg, var(--band-sky) 0%, var(--band-sky-end) 100%);
   }
 
   .sm-btn-on-brand {

@@ -29,7 +29,7 @@ module.exports = {
         warn: '#b45309',
         band: {
           orange: '#ffedd5',
-          sky: '#dbeafe',
+          sky: '#bfdbfe',
           cream: '#fff7ed',
         },
       },

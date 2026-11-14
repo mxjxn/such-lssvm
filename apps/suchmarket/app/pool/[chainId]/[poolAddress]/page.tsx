@@ -107,7 +107,7 @@ export default function PoolDetailPage() {
               className="aspect-[16/10] bg-mist flex items-end p-6"
               style={{
                 backgroundImage:
-                  'linear-gradient(135deg, #ffedd5 0%, #fdba74 35%, #2563eb 100%)',
+                  'linear-gradient(135deg, #ffedd5 0%, #fdba74 45%, #c2410c 100%)',
               }}
             >
               <div>

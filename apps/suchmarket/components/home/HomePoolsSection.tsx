@@ -27,7 +27,7 @@ export function HomePoolsSection({
         aria-hidden
         style={{
           backgroundImage:
-            'radial-gradient(ellipse 55% 50% at 95% 10%, rgba(37,99,235,0.28), transparent), radial-gradient(circle at 8% 80%, rgba(234,88,12,0.35), transparent 45%)',
+            'radial-gradient(circle at 12% 75%, rgba(234,88,12,0.28), transparent 42%), radial-gradient(ellipse 50% 40% at 90% 15%, rgba(253,186,116,0.45), transparent)',
         }}
       />
       <div className="sm-container relative py-10 md:py-14">
