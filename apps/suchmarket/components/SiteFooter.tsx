@@ -11,7 +11,7 @@ export function SiteFooter() {
     <footer className="sm-footer-bar mt-auto">
       <div className="sm-container py-10 flex flex-col sm:flex-row gap-6 sm:items-end sm:justify-between">
         <div>
-          <p className="sm-heading text-xl text-white">such.market</p>
+          <p className="sm-wordmark text-2xl text-white">such.market</p>
           <p className="mt-1 max-w-md text-sm text-white/85 leading-relaxed">
             NFT AMM pools on Base — the sales home for the cryptoart ecosystem. Studio launches
             contracts; social embeds the market; auctions arrive here next.

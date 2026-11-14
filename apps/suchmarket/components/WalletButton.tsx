@@ -8,7 +8,7 @@ export function WalletButton({ onBrand = false }: { onBrand?: boolean }) {
   const { disconnect } = useDisconnect()
 
   const connectedClass = onBrand
-    ? 'sm-btn-on-brand-ghost font-mono text-xs'
+    ? 'sm-btn-on-brand-ghost font-mono text-sm'
     : 'sm-btn-secondary font-mono text-xs'
   const connectClass = onBrand ? 'sm-btn-on-brand' : 'sm-btn-primary'
 

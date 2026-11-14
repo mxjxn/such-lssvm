@@ -145,7 +145,15 @@ a {
 
   .sm-heading {
     font-family: var(--font-comic), 'Comic Neue', cursive;
-    @apply text-ink tracking-tight;
+    @apply text-ink tracking-tight font-bold;
+  }
+
+  /* Brand wordmark — Comic Neue Bold, never thin */
+  .sm-wordmark {
+    font-family: var(--font-comic), 'Comic Neue', cursive;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
   }
 
   .sm-header-bar {
@@ -169,11 +177,11 @@ a {
   }
 
   .sm-btn-on-brand {
-    @apply sm-btn rounded-xl border-2 border-white/90 bg-white text-orange-deep hover:bg-mist disabled:cursor-not-allowed disabled:opacity-40;
+    @apply sm-btn rounded-xl border-2 border-white/90 bg-white text-orange-deep hover:bg-mist disabled:cursor-not-allowed disabled:opacity-40 px-5 py-3 text-base font-semibold;
     box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
   }
 
   .sm-btn-on-brand-ghost {
-    @apply sm-btn rounded-xl border-2 border-white/50 bg-white/10 text-white hover:bg-white/20;
+    @apply sm-btn rounded-xl border-2 border-white/50 bg-white/10 text-white hover:bg-white/20 px-5 py-3 text-base;
   }
 }
