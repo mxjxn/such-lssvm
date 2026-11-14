@@ -33,7 +33,7 @@ export function HomePoolsSection({
       <div className="sm-container relative py-10 md:py-14">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
           <div>
-            <p className="sm-wordmark text-5xl md:text-7xl text-orange-deep">
+            <p className="sm-wordmark text-4xl md:text-6xl text-orange-deep">
               such.market
             </p>
             <h1 className="mt-3 text-base md:text-lg text-mute font-normal max-w-xl leading-relaxed">

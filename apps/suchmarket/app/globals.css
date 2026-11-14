@@ -148,12 +148,13 @@ a {
     @apply text-ink tracking-tight font-bold;
   }
 
-  /* Brand wordmark — Comic Neue Bold, never thin */
+  /* Brand wordmark — Luckiest Guy (display); Comic Neue stays on headings/badges */
   .sm-wordmark {
-    font-family: var(--font-comic), 'Comic Neue', cursive;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
+    font-family: var(--font-wordmark), 'Luckiest Guy', cursive;
+    font-weight: 400;
+    /* slight positive tracking — Luckiest Guy already reads heavy */
+    letter-spacing: 0.01em;
+    line-height: 0.95;
   }
 
   .sm-header-bar {

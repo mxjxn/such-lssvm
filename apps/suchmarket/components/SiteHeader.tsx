@@ -26,7 +26,7 @@ export function SiteHeader() {
       <div className="sm-container flex min-h-[4.5rem] md:min-h-[5rem] items-center justify-between gap-4 py-3 md:py-4">
         <div className="flex items-center gap-6 md:gap-10 min-w-0">
           <Link href="/" className="shrink-0">
-            <span className="sm-wordmark text-3xl md:text-4xl text-white drop-shadow-sm">
+            <span className="sm-wordmark text-[1.65rem] md:text-[1.85rem] leading-none text-white drop-shadow-sm">
               such.market
             </span>
           </Link>
