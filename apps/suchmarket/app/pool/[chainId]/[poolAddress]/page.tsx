@@ -101,17 +101,19 @@ export default function PoolDetailPage() {
       <div className="grid lg:grid-cols-5 gap-8">
         <div className="lg:col-span-3 space-y-6">
           {/* Visual anchor */}
-          <div className="sm-card overflow-hidden">
+          <div className="sm-card overflow-hidden shadow-play">
             <div
               className="aspect-[16/10] bg-mist flex items-end p-6"
               style={{
                 backgroundImage:
-                  'linear-gradient(135deg, #efefed 0%, #e2e8e4 40%, #d5ddd8 100%)',
+                  'linear-gradient(135deg, #ffedd5 0%, #fdba74 35%, #2563eb 100%)',
               }}
             >
               <div>
-                <p className="font-display text-3xl text-ink">{poolTypeLabel(pool.poolType)} pool</p>
-                <p className="mt-1 text-sm text-mute">
+                <p className="sm-heading text-3xl text-white drop-shadow">
+                  {poolTypeLabel(pool.poolType)} pool
+                </p>
+                <p className="mt-1 text-sm text-white/90">
                   {isERC1155 ? 'ERC-1155' : 'ERC-721'} · {curveType}
                 </p>
               </div>

@@ -21,19 +21,19 @@ export function HomePoolsSection({
   const items = showSamples ? SAMPLE_POOLS : pools
 
   return (
-    <section className="relative overflow-hidden border-b border-line">
+    <section className="relative overflow-hidden border-b-2 border-line">
       <div
-        className="absolute inset-0 opacity-60 pointer-events-none"
+        className="absolute inset-0 opacity-80 pointer-events-none"
         aria-hidden
         style={{
           backgroundImage:
-            'radial-gradient(ellipse 70% 50% at 85% 0%, rgba(44,95,79,0.10), transparent), radial-gradient(ellipse 40% 35% at 5% 90%, rgba(166,93,78,0.06), transparent)',
+            'radial-gradient(ellipse 70% 50% at 90% 0%, rgba(37,99,235,0.14), transparent), radial-gradient(ellipse 45% 40% at 0% 100%, rgba(234,88,12,0.16), transparent)',
         }}
       />
       <div className="sm-container relative py-10 md:py-14">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
           <div>
-            <p className="font-display text-3xl md:text-5xl tracking-tight text-ink leading-[1.05]">
+            <p className="sm-heading text-4xl md:text-6xl text-orange-deep leading-[1.05]">
               such.market
             </p>
             <h1 className="mt-3 text-base md:text-lg text-mute font-normal max-w-xl leading-relaxed">
@@ -46,28 +46,37 @@ export function HomePoolsSection({
         </div>
 
         {showSamples && (
-          <p className="mb-4 text-xs uppercase tracking-[0.12em] text-soft">
-            Sample data · preview mode — not on-chain
+          <p className="mb-4 sm-play text-sm text-sky-deep">
+            Sample data · preview mode — not on-chain (just vibes)
           </p>
         )}
 
         {isLoading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" aria-busy aria-label="Loading pools">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" aria-busy aria-label="Loading pools">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="sm-card p-4 h-[132px] animate-pulse bg-mist/80 border-line" />
+              <div
+                key={i}
+                className="sm-card overflow-hidden animate-pulse"
+              >
+                <div className="aspect-[4/3] bg-mist" />
+                <div className="p-4 space-y-2">
+                  <div className="h-5 w-2/3 rounded bg-mist" />
+                  <div className="h-4 w-1/3 rounded bg-mist" />
+                </div>
+              </div>
             ))}
           </div>
         ) : error && !showSamples ? (
           <div className="sm-card p-8 text-center">
-            <p className="text-clay text-sm font-medium">Could not load pools</p>
+            <p className="sm-heading text-xl text-clay">Could not load pools</p>
             <p className="mt-2 text-xs text-mute">{error.message}</p>
             <Link href="/explore" className="sm-btn-secondary inline-flex mt-6">
               Try explore
             </Link>
           </div>
         ) : items.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-line bg-white/60 px-6 py-14 text-center">
-            <p className="font-display text-xl text-ink">No pools yet</p>
+          <div className="rounded-2xl border-2 border-dashed border-line bg-white/70 px-6 py-14 text-center shadow-play">
+            <p className="sm-heading text-2xl text-ink">No pools yet</p>
             <p className="mt-2 text-sm text-mute max-w-md mx-auto leading-relaxed">
               When traders open buy, sell, or trade pools on this chain, they will appear here.
             </p>
@@ -75,27 +84,16 @@ export function HomePoolsSection({
               <Link href="/create" className="sm-btn-primary">
                 Create a pool
               </Link>
-              <Link href="/?preview=1" className="sm-btn-ghost text-xs">
+              <Link href="/?preview=1" className="sm-btn-ghost text-xs sm-play">
                 Preview with samples
               </Link>
             </div>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {items.slice(0, 6).map((pool) =>
-              showSamples ? (
-                <div key={pool.poolAddress} className="relative">
-                  <span className="absolute top-3 right-3 z-10 text-[10px] uppercase tracking-wider text-soft bg-mist border border-line px-2 py-0.5 rounded">
-                    Sample
-                  </span>
-                  <div className="pointer-events-none opacity-95">
-                    <PoolListCard pool={pool} chainId={chainId} />
-                  </div>
-                </div>
-              ) : (
-                <PoolListCard key={pool.poolAddress} pool={pool} chainId={chainId} />
-              )
-            )}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {items.slice(0, 6).map((pool) => (
+              <PoolListCard key={pool.poolAddress} pool={pool} chainId={chainId} />
+            ))}
           </div>
         )}
       </div>

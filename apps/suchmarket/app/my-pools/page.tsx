@@ -45,7 +45,7 @@ export default function MyPoolsPage() {
   if (!isConnected || !address) {
     return (
       <div className="sm-container py-16 max-w-md text-center space-y-4">
-        <h1 className="font-display text-3xl text-ink">My pools</h1>
+        <h1 className="sm-heading text-3xl">My pools</h1>
         <p className="text-sm text-mute">Connect your wallet to manage pools you own.</p>
         <div className="flex justify-center">
           <WalletButton />
@@ -60,7 +60,7 @@ export default function MyPoolsPage() {
     <div className="sm-container py-10">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-ink">My pools</h1>
+          <h1 className="sm-heading text-3xl">My pools</h1>
           <p className="mt-2 text-sm text-mute">
             Manage liquidity on {getChainName(chainId)} — change price, fees, deposit or withdraw.
           </p>
@@ -106,7 +106,7 @@ export default function MyPoolsPage() {
 
           <div className="lg:col-span-2">
             <div className="sm-card p-5 space-y-4 sticky top-20">
-              <h2 className="font-display text-xl">Manage</h2>
+              <h2 className="sm-heading text-xl">Manage</h2>
               {!manage ? (
                 <p className="text-sm text-mute">Select a pool to change parameters or liquidity.</p>
               ) : (

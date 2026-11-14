@@ -59,7 +59,7 @@ export default function CreateChainPage() {
 
   return (
     <div className="sm-container py-10 max-w-2xl">
-      <h1 className="font-display text-3xl text-ink mb-6">Create a pool</h1>
+      <h1 className="sm-heading text-3xl mb-6">Create a pool</h1>
       <div className="sm-card p-6">
         <CreatePoolForm
           chainId={chainId}

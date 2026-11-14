@@ -37,7 +37,7 @@ export function CurveExplainer({
 
   return (
     <aside className="sm-card p-5 space-y-3">
-      <h3 className="font-display text-lg text-ink">How pricing works</h3>
+      <h3 className="sm-heading text-lg">How pricing works</h3>
       <p className="text-sm text-mute leading-relaxed">{explainPoolForArtist(poolType)}</p>
       <p className="text-sm text-ink/80 leading-relaxed">{body}</p>
       <dl className="grid grid-cols-3 gap-3 pt-2 border-t border-line text-center">

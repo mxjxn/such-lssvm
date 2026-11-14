@@ -40,7 +40,7 @@ export default function EmbedCollectionCard() {
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="block w-full max-w-sm rounded-xl border border-line bg-white p-4 shadow-soft"
+      className="block w-full max-w-sm rounded-2xl border-2 border-line bg-white p-4 shadow-play"
     >
       <p className="text-[10px] uppercase tracking-wider text-soft">such.market · collection</p>
       <p className="mt-1 font-mono text-xs text-ink truncate">{nft}</p>
@@ -52,11 +52,11 @@ export default function EmbedCollectionCard() {
             : `No pools yet · ${getChainName(chainId)}`}
       </p>
       {lowest && (
-        <p className="mt-2 font-display text-xl text-ink">
+        <p className="mt-2 sm-heading text-xl text-ink">
           from {formatEth(BigInt(lowest.spotPrice))} ETH
         </p>
       )}
-      <p className="mt-3 text-xs text-forest">Browse liquidity →</p>
+      <p className="mt-3 text-xs text-sky-deep">Browse liquidity →</p>
     </a>
   )
 }

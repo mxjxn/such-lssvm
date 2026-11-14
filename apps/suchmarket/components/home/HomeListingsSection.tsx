@@ -5,45 +5,49 @@ import { SAMPLE_AUCTIONS, type SampleAuction } from '@/lib/homeFixtures'
 
 function AuctionCard({ auction, sample }: { auction: SampleAuction; sample?: boolean }) {
   return (
-    <div className="relative border-b border-line last:border-0 py-4 first:pt-0 last:pb-0">
-      {sample && (
-        <span className="absolute top-0 right-0 text-[10px] uppercase tracking-wider text-soft">
-          Sample
-        </span>
+    <div className="relative flex gap-3 border-b-2 border-line/60 last:border-0 py-4 first:pt-0 last:pb-0">
+      {auction.imageUrl && (
+        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 border-line bg-mist">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={auction.imageUrl} alt="" className="h-full w-full object-cover" />
+          {sample && (
+            <span className="sm-badge-sample absolute -left-1 -top-1 scale-90">Sample</span>
+          )}
+        </div>
       )}
-      <p className="text-[11px] uppercase tracking-[0.1em] text-soft">{auction.lotLabel}</p>
-      <p className="mt-1 font-display text-lg text-ink leading-snug">{auction.title}</p>
-      <div className="mt-2 flex items-baseline justify-between gap-3 text-sm">
-        <span className="text-mute">
-          Bid <span className="text-ink font-medium">{auction.currentBid}</span>
-        </span>
-        <span className="text-xs text-soft">{auction.endsIn} left</span>
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] uppercase tracking-[0.1em] text-soft">{auction.lotLabel}</p>
+        <p className="mt-0.5 sm-heading text-lg text-ink leading-snug truncate">{auction.title}</p>
+        <div className="mt-1 flex items-baseline justify-between gap-3 text-sm">
+          <span className="text-mute">
+            Bid <span className="text-ink font-semibold tabular-nums">{auction.currentBid}</span>
+          </span>
+          <span className="text-xs text-soft">{auction.endsIn} left</span>
+        </div>
       </div>
     </div>
   )
 }
 
 export function HomeListingsSection({ preview }: { preview: boolean }) {
-  // No live auction data path yet — preview shows labeled samples; otherwise empty placeholder.
   const auctions = preview ? SAMPLE_AUCTIONS : []
 
   return (
     <section className="sm-container py-10 md:py-14">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10">
-        {/* Featured auctions — wider */}
         <div className="lg:col-span-3">
           <div className="flex items-end justify-between gap-4 mb-5">
             <div>
-              <h2 className="font-display text-2xl md:text-3xl text-ink">Featured auctions</h2>
+              <h2 className="sm-heading text-2xl md:text-3xl">Featured auctions</h2>
               <p className="mt-1 text-sm text-mute">Timed lots from the auction house.</p>
             </div>
-            <Link href="/auctions" className="text-sm text-forest hover:underline shrink-0">
+            <Link href="/auctions" className="text-sm text-sky-deep hover:underline shrink-0 sm-play">
               View all auctions
             </Link>
           </div>
 
           {preview && auctions.length > 0 && (
-            <p className="mb-3 text-xs uppercase tracking-[0.12em] text-soft">
+            <p className="mb-3 sm-play text-sm text-sky-deep">
               Sample data · preview mode — not live lots
             </p>
           )}
@@ -51,7 +55,7 @@ export function HomeListingsSection({ preview }: { preview: boolean }) {
           <div className="sm-card p-5 md:p-6">
             {auctions.length === 0 ? (
               <div className="py-8 text-center">
-                <p className="font-display text-lg text-ink">Auctions coming soon</p>
+                <p className="sm-heading text-xl text-ink">Auctions coming soon</p>
                 <p className="mt-2 text-sm text-mute max-w-sm mx-auto leading-relaxed">
                   English auctions will list here beside pools. Browse the stub page for updates.
                 </p>
@@ -60,7 +64,7 @@ export function HomeListingsSection({ preview }: { preview: boolean }) {
                 </Link>
                 {!preview && (
                   <p className="mt-4">
-                    <Link href="/?preview=1" className="text-xs text-soft hover:text-mute">
+                    <Link href="/?preview=1" className="text-xs text-soft hover:text-mute sm-play">
                       Preview with sample lots
                     </Link>
                   </p>
@@ -76,10 +80,9 @@ export function HomeListingsSection({ preview }: { preview: boolean }) {
           </div>
         </div>
 
-        {/* Create a listing — narrower */}
         <div className="lg:col-span-2">
-          <h2 className="font-display text-2xl md:text-3xl text-ink mb-5">Create a listing</h2>
-          <div className="sm-card p-5 md:p-6 h-full">
+          <h2 className="sm-heading text-2xl md:text-3xl mb-5">Create a listing</h2>
+          <div className="sm-card p-5 md:p-6 shadow-play h-full">
             <p className="text-sm text-mute leading-relaxed mb-5">
               List NFTs you already own. No minting or metadata edits here — those live in studio.
             </p>
@@ -129,15 +132,17 @@ function ListingOption({
     <li>
       <Link
         href={href}
-        className="block rounded-lg border border-line px-4 py-3.5 hover:border-ink/25 hover:bg-mist/50 transition"
+        className="block rounded-xl border-2 border-line px-4 py-3.5 hover:border-sky hover:bg-sky/5 transition"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="font-medium text-ink">{title}</p>
+            <p className="sm-heading text-base text-ink">{title}</p>
             <p className="mt-0.5 text-xs text-mute leading-relaxed">{body}</p>
           </div>
           <span
-            className={`text-xs shrink-0 mt-0.5 ${soon ? 'text-soft uppercase tracking-wider' : 'text-forest'}`}
+            className={`text-xs shrink-0 mt-0.5 ${
+              soon ? 'sm-play text-soft uppercase tracking-wider' : 'text-orange-deep font-medium'
+            }`}
           >
             {cta}
           </span>

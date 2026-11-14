@@ -169,14 +169,14 @@ export function TradePanel({ chainId, poolAddress, isERC1155, poolNftId }: Trade
   }
 
   return (
-    <div className="sm-card p-5 space-y-5">
-      <div className="flex rounded-md border border-line p-0.5 bg-mist/50">
+    <div className="sm-card p-5 space-y-5 shadow-play">
+      <div className="flex rounded-xl border-2 border-line p-0.5 bg-mist/50">
         <button
           type="button"
           disabled={!canTradeBuy}
           onClick={() => setMode('buy')}
-          className={`flex-1 rounded py-2 text-sm ${
-            mode === 'buy' ? 'bg-white shadow-sm text-ink' : 'text-mute'
+          className={`flex-1 rounded-xl py-2 text-sm ${
+            mode === 'buy' ? 'bg-white shadow-sm text-orange-deep font-medium' : 'text-mute'
           } disabled:opacity-30`}
         >
           Buy
@@ -185,8 +185,8 @@ export function TradePanel({ chainId, poolAddress, isERC1155, poolNftId }: Trade
           type="button"
           disabled={!canTradeSell}
           onClick={() => setMode('sell')}
-          className={`flex-1 rounded py-2 text-sm ${
-            mode === 'sell' ? 'bg-white shadow-sm text-ink' : 'text-mute'
+          className={`flex-1 rounded-xl py-2 text-sm ${
+            mode === 'sell' ? 'bg-white shadow-sm text-sky-deep font-medium' : 'text-mute'
           } disabled:opacity-30`}
         >
           Sell

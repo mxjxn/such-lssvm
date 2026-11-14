@@ -22,7 +22,7 @@ export default function CreatePoolPage() {
   return (
     <div className="sm-container py-10 max-w-2xl">
       <header className="mb-8">
-        <h1 className="font-display text-3xl text-ink">Create a pool</h1>
+        <h1 className="sm-heading text-3xl md:text-4xl">Create a pool</h1>
         <p className="mt-2 text-sm text-mute leading-relaxed">
           Open a buy, sell, or trade pool on {getChainName(chainId)}. Default curve:{' '}
           <strong>{LAUNCH_CURVE}</strong>. More curves and Ethereum can be enabled later.

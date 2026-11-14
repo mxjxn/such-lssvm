@@ -2,14 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  such.market theme — playful orange + sky/cobalt on cream.
+  Tweak these variables; Tailwind color tokens mirror them.
+  Contrast targets: WCAG AA for body text and primary buttons.
+*/
 :root {
-  --ink: #121212;
-  --paper: #f8f8f6;
-  --mist: #efefed;
-  --line: #e2e2de;
-  --mute: #5c5c5c;
-  --forest: #2c5f4f;
-  --forest-deep: #1e4338;
+  --ink: #1c1917;
+  --paper: #fff8f1;
+  --mist: #ffedd5;
+  --line: #fdba74;
+  --mute: #57534e;
+  --soft: #78716c;
+  --orange: #ea580c;
+  --orange-deep: #c2410c; /* white text ≥ AA */
+  --sky: #2563eb;
+  --sky-deep: #1d4ed8;
+  --clay: #b91c1c;
+  --warn: #b45309;
+  /* legacy aliases used across components */
+  --forest: var(--orange);
+  --forest-deep: var(--orange-deep);
+  --shadow-play: 4px 6px 0 rgba(37, 99, 235, 0.18);
+  --shadow-soft: 0 2px 0 rgba(194, 65, 12, 0.12), 0 12px 28px rgba(28, 25, 23, 0.06);
 }
 
 * {
@@ -23,7 +38,10 @@ html {
 body {
   margin: 0;
   color: var(--ink);
-  background: var(--paper);
+  background:
+    radial-gradient(ellipse 80% 50% at 100% -10%, rgba(37, 99, 235, 0.12), transparent),
+    radial-gradient(ellipse 60% 40% at -10% 100%, rgba(234, 88, 12, 0.14), transparent),
+    var(--paper);
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -34,12 +52,12 @@ a {
 }
 
 *:focus-visible {
-  outline: 2px solid var(--forest);
+  outline: 2px solid var(--sky);
   outline-offset: 2px;
 }
 
 ::selection {
-  background: rgba(44, 95, 79, 0.18);
+  background: rgba(234, 88, 12, 0.22);
 }
 
 @layer components {
@@ -48,15 +66,21 @@ a {
   }
 
   .sm-btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition;
   }
 
   .sm-btn-primary {
-    @apply sm-btn bg-forest text-white hover:bg-forest-deep disabled:cursor-not-allowed disabled:opacity-40;
+    @apply sm-btn bg-orange-deep text-white hover:bg-orange disabled:cursor-not-allowed disabled:opacity-40;
+    box-shadow: 0 3px 0 var(--sky-deep);
+  }
+
+  .sm-btn-primary:hover:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 2px 0 var(--sky-deep);
   }
 
   .sm-btn-secondary {
-    @apply sm-btn border border-line bg-white text-ink hover:border-ink/30 hover:bg-mist disabled:cursor-not-allowed disabled:opacity-40;
+    @apply sm-btn border-2 border-sky bg-white text-sky-deep hover:bg-sky/5 disabled:cursor-not-allowed disabled:opacity-40;
   }
 
   .sm-btn-ghost {
@@ -64,7 +88,8 @@ a {
   }
 
   .sm-input {
-    @apply w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm text-ink placeholder:text-soft outline-none transition focus:border-forest;
+    @apply w-full rounded-xl border-2 border-line bg-white px-3 py-2.5 text-sm text-ink placeholder:text-soft outline-none transition focus:border-sky;
+    font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   }
 
   .sm-label {
@@ -72,18 +97,38 @@ a {
   }
 
   .sm-card {
-    @apply rounded-xl border border-line bg-white shadow-soft;
+    @apply rounded-2xl border-2 border-line bg-white;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .sm-card-tilt:hover {
+    transform: rotate(-0.6deg);
   }
 
   .sm-chip {
-    @apply inline-flex items-center rounded-full border border-line bg-mist px-2.5 py-0.5 text-xs text-mute;
+    @apply inline-flex items-center rounded-full border-2 border-sky/30 bg-sky/10 px-2.5 py-0.5 text-xs text-sky-deep;
+    font-family: var(--font-comic), 'Comic Neue', cursive;
+  }
+
+  .sm-badge-sample {
+    @apply inline-flex items-center rounded-full border-2 border-orange-deep bg-orange text-white px-2.5 py-0.5 text-[10px] uppercase tracking-wide;
+    font-family: var(--font-comic), 'Comic Neue', cursive;
   }
 
   .sm-choice {
-    @apply rounded-md border border-line bg-white px-4 py-3 text-sm text-mute transition hover:border-ink/25 hover:text-ink;
+    @apply rounded-xl border-2 border-line bg-white px-4 py-3 text-sm text-mute transition hover:border-sky/40 hover:text-ink;
   }
 
   .sm-choice-active {
-    @apply border-forest bg-forest/5 text-forest font-medium;
+    @apply border-orange-deep bg-orange/10 text-orange-deep font-medium;
+  }
+
+  .sm-play {
+    font-family: var(--font-comic), 'Comic Neue', cursive;
+  }
+
+  .sm-heading {
+    font-family: var(--font-comic), 'Comic Neue', cursive;
+    @apply text-ink tracking-tight;
   }
 }

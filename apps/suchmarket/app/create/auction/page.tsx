@@ -7,8 +7,8 @@ import Link from 'next/link'
 export default function CreateAuctionStubPage() {
   return (
     <div className="sm-container py-16 max-w-xl">
-      <p className="text-xs uppercase tracking-[0.14em] text-soft mb-2">Coming soon</p>
-      <h1 className="font-display text-3xl md:text-4xl text-ink">Create an auction</h1>
+      <p className="sm-play text-sm text-sky-deep mb-2">Coming soon</p>
+      <h1 className="sm-heading text-3xl md:text-4xl">Create an auction</h1>
       <p className="mt-4 text-mute text-sm leading-relaxed">
         List an NFT you already own in a timed English auction. Creation will live here once the
         auction house lands under such.market.

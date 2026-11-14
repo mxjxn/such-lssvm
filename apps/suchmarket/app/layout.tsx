@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
-import { Fraunces, Sora } from 'next/font/google'
+import { Comic_Neue, Sora } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
 
-const fraunces = Fraunces({
+const comicNeue = Comic_Neue({
   subsets: ['latin'],
-  variable: '--font-fraunces',
+  weight: ['400', '700'],
+  variable: '--font-comic',
   display: 'swap',
 })
 
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${sora.variable}`}>
+    <html lang="en" className={`${comicNeue.variable} ${sora.variable}`}>
       <body className="font-sans min-h-screen flex flex-col bg-paper text-ink antialiased">
         <Providers>
           <SiteHeader />
