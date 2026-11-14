@@ -16,9 +16,9 @@ export const SAMPLE_ART: string[] = [
     </linearGradient>
   </defs>
   <rect width="400" height="400" fill="#fff7ed"/>
-  <circle cx="140" cy="160" r="110" fill="url(#g)" opacity="0.95"/>
-  <circle cx="280" cy="240" r="90" fill="#2563eb" opacity="0.85"/>
-  <rect x="60" y="280" width="280" height="48" rx="24" fill="#c2410c" opacity="0.9"/>
+  <circle cx="130" cy="150" r="100" fill="url(#g)"/>
+  <rect x="60" y="280" width="280" height="48" rx="24" fill="#c2410c"/>
+  <circle cx="310" cy="90" r="42" fill="#2563eb"/>
 </svg>`),
   svgDataUri(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
