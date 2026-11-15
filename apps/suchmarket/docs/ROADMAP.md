@@ -96,6 +96,16 @@ Agents do **not** run broadcast or touch `.env*` files.
 | Indexer hosting runbook (Neon/Railway/etc.) | **Max** |
 | QA on live Sepolia pools + TestNFT contracts | Agent + Max |
 
+## Barter offers (post-launch)
+
+Peer **bundle-for-bundle** trading on **Seaport 1.6** (canonical address on Base, Base Sepolia, Ethereum). Post–Sepolia/mainnet LSSVM + auction polish. Design: **[BARTER_OFFERS.md](./BARTER_OFFERS.md)** (off-chain order book, criteria wants, partial fills, counters, match dashboard, fees, phases).
+
+| Step | Owner |
+| --- | --- |
+| Review design + open questions | **Max** |
+| Conduit + fee recipient per chain | **Max** |
+| Implementation phases 1–4 | Agent (after launch) |
+
 ## Remaining — mainnet
 
 | Step | Owner |
