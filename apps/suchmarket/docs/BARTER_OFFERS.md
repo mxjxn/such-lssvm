@@ -19,8 +19,8 @@ Orders are **EIP-712 signed** and fulfilled on-chain via Seaport; such.market ho
 | # | Decision |
 | --- | --- |
 | 1 | **Dedicated such.market conduit** on each supported chain (deploy via `ConduitController`; sole conduit promoted in UI). |
-| 2 | **Fee recipient & bps:** TBD at launch config; likely **aligned with LSSVM protocol fee settings** (same recipient / similar bps). |
-| 3 | **Fee payer:** **Taker (filler) pays by default**; UI may allow offerer-pays variant when building the order. |
+| 2 | **Fee:** **2% (200 bps)**. **Taker pays by default** (offerer-pays optional at build). Recipient is **owner-settable**, starts as **deployer wallet**; ownership **transferable** (`Ownable2Step`-style). Config via on-chain **`BarterFeeConfig`** (recommended) — see §8. |
+| 3 | **ERC-20 currency legs:** **WETH**, **USDC**, plus **admin-managed token allowlist**. Unverified ERC-20s **cannot** be payment/consideration currency. |
 | 4 | **Holdings index at launch:** **Connected wallets + offerers only** (no global watchlist crawl). |
 | 5 | **Counters:** **Anyone** can post a counteroffer. |
 | 6 | **ETH legs:** Use **WETH** (ERC-20), not native ETH, for all chains in v1. |
@@ -28,6 +28,7 @@ Orders are **EIP-712 signed** and fulfilled on-chain via Seaport; such.market ho
 | 8 | **Zones:** **Launch with `zone = address(0)`**. Custom zones ship **later**, together with **barter metadata standards** for richer offer types. |
 | 9 | **Compliance:** Required — see §Compliance. **Legal review before expanding** allowed barter types beyond Phase 1. |
 | 10 | **Nav label:** **Barter** (not “Trade” / not “Barter offers” in the tab). |
+| 11 | **NFT verification:** Studio mints auto-verified; others apply/admin-curate; unverified offers allowed with badge; default feeds hide unverified except profile/followers + toggle. **No refundable deposit.** |
 
 ---
 
@@ -37,7 +38,7 @@ Orders are **EIP-712 signed** and fulfilled on-chain via Seaport; such.market ho
 
 | Stage | User-facing scope |
 | --- | --- |
-| **Phase 1 (launch)** | **NFT-for-NFT / token bundles only** — specific ERC-721 / ERC-1155 IDs plus ERC-20 amounts; **WETH** for ETH-denominated value. All-or-nothing fills. |
+| **Phase 1 (launch)** | **NFT-for-NFT / token bundles only** — specific ERC-721 / ERC-1155 IDs plus **allowlisted ERC-20** (WETH, USDC, + admin list). All-or-nothing fills. |
 | **Later** | Collection-wide criteria, ID merkle sets, partial fills, trait wants (our indexer), custom zones, and additional asset/policy types **after** legal sign-off per stage. |
 
 Downstream sections describe the **full target**; implementation tracks the table above unless a phase note says otherwise.
@@ -71,8 +72,9 @@ Seaport **offer** and **consideration** item arrays:
 
 | Asset | Seaport item type | Notes |
 | --- | --- | --- |
-| **WETH** | `ERC20` | **All “ETH value” legs use WETH** (per Max). Wrap/unwrap UX in flow. |
-| ERC-20 | `ERC20` | Amount + token |
+| **WETH** | `ERC20` | All ETH-notional legs use **WETH**. Wrap/unwrap in flow. |
+| **USDC** | `ERC20` | Allowed payment/consideration currency (chain-native USDC address). |
+| Other ERC-20 | `ERC20` | Only if on **`barter_token_allowlist`** (admin). **Unlisted tokens rejected** at API ingest for any fee or currency leg. |
 | ERC-721 | `ERC721` | Specific `identifier` or criteria (post–Phase 1) |
 | ERC-1155 | `ERC1155` | `identifier` + amounts |
 
@@ -112,6 +114,34 @@ Tables: `wallet_balances_erc20`, `wallet_nfts_721`, `wallet_nfts_1155`, `wallet_
 
 `barter_offer_wants` for SQL prefilter; merkle/criteria verification at fill time when enabled. Match materialization for **connected** wallets after indexer sync.
 
+**Unverified NFT collections** (§9): Offers that include unverified contracts are **allowed** but excluded from default **Offers you can fill** unless the viewer enables **“Show unverified”**. They remain visible on the **creator’s profile** and to **followers/collector graph** (see §9).
+
+---
+
+## 4a. Order book pruning & re-validation
+
+Unfillable offers are **removed from the active book** (status `pruned` or `inactive`; retained for history). Seaport has **no protocol fee**; pruning is **off-chain UX + API** only (on-chain orders may still exist until cancelled).
+
+**Prune job** (cron, e.g. every 5–15 min with indexer):
+
+| Condition | Action |
+| --- | --- |
+| `end_time` passed | Mark expired; drop from list/match indexes |
+| Cancel tx indexed or DB `cancelled` | Remove |
+| Offerer **counter** on Seaport > order’s signed counter | Stale signature; remove |
+| Offerer no longer **owns** offered NFTs (721 `ownerOf`, 1155 balance) | Remove |
+| Insufficient **ERC-20 balance** on offer side | Remove |
+| Missing **conduit approval** for offered NFTs (offerer) | Remove from `fulfillable` feed (optional soft-hide until re-approved) |
+
+**Re-validation triggers** (synchronous before fill + incremental for match feed):
+
+- User opens offer detail or clicks **Fill**
+- User loads **Offers you can fill**
+- Indexer processes **Transfer** / **ApprovalForAll** for wallets in `wallet_watchlist` or known offerers
+- After **prune job** batch, refresh `fulfillable` flags
+
+Failed re-validation does not delete historical row; it sets `listable = false` and `unfillable_reason`.
+
 ---
 
 ## 4. Off-chain order book
@@ -121,7 +151,7 @@ Tables: `wallet_balances_erc20`, `wallet_nfts_721`, `wallet_nfts_1155`, `wallet_
 | **Storage** | Postgres: EIP-712 + signature + `order_hash`, status, `order_json`, metadata schema version. |
 | **API routes (sketch)** | `POST/GET /api/barter/offers`, `match`, `cancel`, `counters`, `thread`. |
 | **Validation** | Signer, counter, times; **ingest rejects unknown zones** until custom zones launch; contract blocklist (§Compliance). |
-| **Fulfillability** | Conduit + WETH/ERC-20 approvals, balances, not cancelled. |
+| **Fulfillability** | Conduit + approvals, allowlisted ERC-20 only, balances; prune job §4a. |
 | **Cancellation / counter** | On-chain counter increment; DB status. |
 
 ---
@@ -148,8 +178,6 @@ No third-party conduit keys in product UI.
 
 ## 7. DB schema sketch
 
-(Unchanged structurally; add fields as needed for compliance/spam: `hidden_by_admin`, `reputation_tier`, `metadata_schema_version`.)
-
 ```sql
 CREATE TABLE barter_offers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -158,7 +186,52 @@ CREATE TABLE barter_offers (
   offerer TEXT NOT NULL,
   seaport_address TEXT NOT NULL,
   zone TEXT NOT NULL DEFAULT '0x0000000000000000000000000000000000000000',
-  -- ... status, parent_offer_id, signature, order_json, fee_payer enum, etc.
+  status TEXT NOT NULL,
+  listable BOOLEAN NOT NULL DEFAULT true,
+  unfillable_reason TEXT,
+  fee_payer TEXT NOT NULL DEFAULT 'taker',
+  fee_bps INT NOT NULL DEFAULT 200,
+  has_unverified_nft BOOLEAN NOT NULL DEFAULT false,
+  parent_offer_id UUID REFERENCES barter_offers(id),
+  signature BYTEA NOT NULL,
+  order_json JSONB NOT NULL,
+  metadata_schema_version TEXT,
+  hidden_by_admin BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- NFT contracts: verification for discovery/filtering (not a ban on offering)
+CREATE TABLE barter_collection_verification (
+  chain_id INT NOT NULL,
+  contract_address TEXT NOT NULL,
+  verified BOOLEAN NOT NULL DEFAULT false,
+  source TEXT NOT NULL, -- 'studio_auto' | 'admin_curated' | 'application'
+  verified_at TIMESTAMPTZ,
+  notes TEXT,
+  PRIMARY KEY (chain_id, contract_address)
+);
+
+-- ERC-20 allowed as currency / fee token (WETH, USDC seeded; admin extends)
+CREATE TABLE barter_token_allowlist (
+  chain_id INT NOT NULL,
+  token_address TEXT NOT NULL,
+  symbol TEXT,
+  decimals INT,
+  enabled BOOLEAN NOT NULL DEFAULT true,
+  added_by TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  PRIMARY KEY (chain_id, token_address)
+);
+
+-- Cache of on-chain BarterFeeConfig (refreshed on read or event)
+CREATE TABLE barter_fee_config_cache (
+  chain_id INT PRIMARY KEY,
+  fee_config_address TEXT NOT NULL,
+  fee_recipient TEXT NOT NULL,
+  fee_bps INT NOT NULL,
+  owner TEXT NOT NULL,
+  synced_at TIMESTAMPTZ NOT NULL
 );
 
 CREATE TABLE barter_policy_blocklist (
@@ -175,34 +248,71 @@ CREATE TABLE barter_reports (
   reason TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
 );
+
+CREATE TABLE barter_wallet_mutes (
+  muter TEXT NOT NULL,
+  muted TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  PRIMARY KEY (muter, muted)
+);
 ```
 
-See §Anti-spam for `barter_wallet_mutes`, rate-limit audit table.
+On-chain **`BarterFeeConfig`** (per chain) is source of truth for recipient/bps/owner; app may cache in `barter_fee_config_cache`.
 
 ---
 
 ## 8. Fees
 
-- **Consideration leg** to such.market **fee recipient** (WETH or ERC-20).
-- **Recipient & bps:** **TBD**; config should **mirror LSSVM `protocolFeeRecipient` / multiplier** where practical (`barter_fee_config` per chain).
-- **Default payer:** **Taker**; configurable at order build (offerer pays = encoded in consideration layout).
-- On-chain fee is explicit in the signed order, not a Seaport protocol hook.
+Seaport has **no built-in protocol fee**; such.market fee is an extra **consideration item** (allowlisted ERC-20, usually WETH or USDC) in the signed order.
+
+| Setting | Value |
+| --- | --- |
+| **Rate** | **200 bps (2%)** of agreed notional (computed at order build; on-chain leg is fixed amount) |
+| **Payer** | **Taker (filler) by default**; offerer-pays variant encoded in consideration layout |
+| **Recipient** | **`feeRecipient`** on config contract; initial value = **deployer wallet** |
+| **Governance** | **`owner`** with **`Ownable2Step`** transfer to multisig/treasury later |
+
+**Where config lives**
+
+| Approach | Pros / cons |
+| --- | --- |
+| App-only env | Fast, opaque to users |
+| **`BarterFeeConfig` contract (recommended)** | Transparent on explorers; same read pattern for such.market + indexers; owner can `setFeeRecipient`, `setFeeBps` (cap e.g. 10%); app + API read via RPC and cache in Postgres |
+
+Order builder reads `feeBps` + `feeRecipient` when constructing consideration; ingest API rejects fee leg mismatch with on-chain config (within tolerance). LSSVM protocol fee is a **separate** on-chain setting on the pair factory; barter fee may **align politically** with LSSVM but is **independent** in Seaport orders.
+
+**No refundable deposit** for offer creation.
 
 ---
 
-## 9. Compliance & disallowed items
+## 9. Compliance, verification & disallowed items
 
-Compliance is **in scope from day one**, even when Phase 1 types are narrow.
+Compliance is **in scope from day one**. Primary risk is **fake/impersonating collections and junk tokens**, not blocking unknown artists from offering their own work.
+
+### Collection verification (NFT legs)
+
+| Status | Rule |
+| --- | --- |
+| **Auto-verified** | Collections **minted via cryptoart.studio** → `barter_collection_verification.verified = true`, `source = studio_auto`. |
+| **Admin-verified** | Other collections **apply**; admins add to curated list (`admin_curated`). |
+| **Unverified** | All other NFT contracts — **offers allowed**. |
+
+**Unverified offer UX**
+
+- **Badge** “Unverified collection” + short warning on offer/detail.
+- **Visible** on creator **profile** and to **followers/collector** audience (social graph / explicit follows).
+- **Hidden** from other users’ default **Offers you can fill** and global **Barter** browse unless **“Show unverified”** is on (persisted toggle).
+- Still subject to **blocklist** and **reports**; admins can hide/delist.
+
+### Hard rules (unchanged / tightened)
 
 | Control | Description |
 | --- | --- |
-| **Contract blocklist** | Postgres + config: banned **token/NFT contract addresses** per chain; reject at API ingest and hide in list APIs. |
-| **Category policy** | Disallowed categories (e.g. unregistered securities, sanction-linked assets, stolen/scam labels) — enumerated in internal policy doc; **legal review** before enabling new categories or ERC-20 barter beyond allowlist. |
-| **Report** | UI **Report** on offer detail → `barter_reports`; moderation queue (off-chain). |
-| **Admin hide/delist** | Admin flag `hidden` / `delisted` on `barter_offers`; hidden offers cannot be fulfilled via such.market UI/API (on-chain order may still exist until cancelled). |
-| **Expansion gate** | **No new barter type or metadata standard** in production without **legal review** (traits, permissive ERC-20, partial fills, zones, etc.). |
-
-Phase 1 reduces risk by limiting to **specific NFT IDs + allowlisted ERC-20/WETH** where policy requires.
+| **ERC-20 currency** | Only **WETH, USDC, allowlist** — never arbitrary unverified ERC-20 as payment or consideration. |
+| **Contract blocklist** | Banned addresses; reject ingest. |
+| **Category policy** | Securities/sanctions/stolen — internal policy; **legal review** before expanding barter types. |
+| **Report / admin** | `barter_reports`; `hidden_by_admin` on offers. |
+| **Expansion gate** | Legal review before Phase 2+ feature flags. |
 
 ---
 
@@ -212,11 +322,9 @@ Phase 1 reduces risk by limiting to **specific NFT IDs + allowlisted ERC-20/WETH
 | --- | --- |
 | **Dust filter** | Minimum notional per offer (WETH/allowlisted ERC-20 floor and/or NFT count rules); reject below threshold at API. |
 | **Rate limits** | Per-wallet cap on **new offers / hour** (and counters if abusive); HTTP 429 + soft warn in UI. |
-| **Default dashboard filters** | Hide offers from **unknown/low-reputation** wallets and **collections not on allowlist**; user toggle **“Show all offers”** (persisted). |
-| **Mute / block** | Wallet can mute offerers; muted hidden from feed and match (per-user, stored server-side). |
-| **Stake / deposit (later)** | Optional small **refundable deposit** on offer creation to raise cost of spam — design TBD, not Phase 1. |
-
-Reputation and collection allowlists tie to studio/cryptoart.social curation over time.
+| **Default dashboard filters** | Hide **unverified NFT** offers (§9) and **blocklisted** assets; toggle **“Show unverified”**. Separate filter for low-reputation wallets optional. |
+| **Mute / block** | `barter_wallet_mutes`; muted offerers hidden from feed/match. |
+| **Pruning** | Remove unfillable orders from active book (§4a) — no refundable deposit. |
 
 ---
 
@@ -238,7 +346,7 @@ Reputation and collection allowlists tie to studio/cryptoart.social curation ove
 | Phase | Scope |
 | --- | --- |
 | **0** | This doc + ROADMAP |
-| **1** | **Barter** nav; NFT↔NFT/token bundles, WETH, dedicated conduit, zone=0, order book API, cancel, **anyone counters**, compliance v1 (blocklist, report, admin hide), anti-spam v1 (dust, rate limit, default filters), taker-pays fee leg (recipient/bps TBD), holdings for connected + offerers |
+| **1** | **Barter** nav; NFT↔NFT/token bundles; WETH/USDC/allowlist; **2% taker fee** + `BarterFeeConfig`; conduit; zone=0; order book + **prune job**; verification UX; compliance v1; anti-spam v1; holdings for connected + offerers |
 | **2** | Criteria (collection + ID merkle), partial fills |
 | **3** | “Offers you can fill” polish; counter threads |
 | **4** | Trait wants (our metadata indexer); custom zones + metadata standards |
@@ -247,12 +355,11 @@ Reputation and collection allowlists tie to studio/cryptoart.social curation ove
 
 ## 13. Open questions for Max
 
-1. **Fee numbers:** Final **bps** and whether barter always shares **exact** LSSVM `protocolFeeRecipient` per chain when those addresses exist.
-2. **Phase 1 ERC-20 allowlist:** Which tokens besides WETH are allowed on Base / Ethereum at launch?
-3. **Collection allowlist:** Who maintains the curated collection list for default dashboard filters (studio vs manual admin)?
-4. **Moderation:** Process for `barter_reports` (SLA, roles) and linkage to on-chain cancel requests.
-5. **Refundable deposit:** If pursued post-launch, amount, token, and refund conditions.
-6. **Legal review checklist:** Sign-off template before enabling Phase 2+ features.
+1. **`BarterFeeConfig` deploy:** Same owner multisig as LSSVM factory / conduit, or separate deployer-at-launch then transfer?
+2. **Verification applications:** Self-serve form (contract + chain proof) vs manual ticket only?
+3. **Followers/collector graph:** Source for “show unverified to my audience” (cryptoart.social API, on-chain holders, or follows table only)?
+4. **Moderation:** SLA and roles for `barter_reports`; when to require on-chain cancel vs admin hide only.
+5. **Legal review checklist:** Sign-off template before Phase 2+ features.
 
 ---
 
