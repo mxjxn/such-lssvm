@@ -19,7 +19,49 @@ describe('slippage', () => {
   })
 })
 
+/** Values from `SuchmarketBaseSepoliaForkTest.test_erc721_erc20_pool_quoteAndFees` (Base Sepolia fork). */
+const FORK_ERC721_ERC20_BUY = {
+  inputAmount: 2_163_000_000_000_000n,
+  protocolFee: 42_000_000_000_000n,
+  royaltyAmount: 0n,
+} as const
+
+/** Values from `SuchmarketBaseSepoliaForkTest.test_exponential_pool_sellBack_viaRouter` (sell quote). */
+const FORK_EXP_SELL = {
+  outputAmount: 2_037_000_000_000_000n,
+  protocolFee: 42_000_000_000_000n,
+  royaltyAmount: 0n,
+} as const
+
 describe('breakdowns', () => {
+  it('matches Base Sepolia fork buy quote decomposition (ERC721/ERC20 pool)', () => {
+    const b = buildBuyBreakdown(
+      FORK_ERC721_ERC20_BUY.inputAmount,
+      FORK_ERC721_ERC20_BUY.protocolFee,
+      FORK_ERC721_ERC20_BUY.royaltyAmount,
+      0
+    )
+    expect(b.total).toBe(FORK_ERC721_ERC20_BUY.inputAmount)
+    expect(b.protocolFee).toBe(FORK_ERC721_ERC20_BUY.protocolFee)
+    expect(b.royaltyAmount).toBe(0n)
+    expect(b.poolComponent).toBe(
+      FORK_ERC721_ERC20_BUY.inputAmount -
+        FORK_ERC721_ERC20_BUY.protocolFee -
+        FORK_ERC721_ERC20_BUY.royaltyAmount
+    )
+  })
+
+  it('matches Base Sepolia fork sell quote decomposition (exponential ETH pool)', () => {
+    const b = buildSellBreakdown(
+      FORK_EXP_SELL.outputAmount,
+      FORK_EXP_SELL.protocolFee,
+      FORK_EXP_SELL.royaltyAmount,
+      0
+    )
+    expect(b.total).toBe(FORK_EXP_SELL.outputAmount)
+    expect(b.protocolFee + b.royaltyAmount + b.total).toBe(b.poolComponent)
+  })
+
   it('builds buy breakdown with fees', () => {
     const b = buildBuyBreakdown(1_000_000_000_000_000_000n, 10_000_000_000_000_000n, 5_000_000_000_000_000n, 50)
     expect(b.total).toBe(1_000_000_000_000_000_000n)
