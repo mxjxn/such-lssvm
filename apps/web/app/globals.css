@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #0f172a;
+  --paper: #f8fafc;
+  --mist: #e2e8f0;
+  --line: #cbd5e1;
+  --mute: #64748b;
+  --soft: #94a3b8;
+  --accent: #334155;
+  --accent-deep: #1e293b;
+  --highlight: #2563eb;
+  --highlight-deep: #1d4ed8;
+  --clay: #b91c1c;
+  --warn: #b45309;
+  --header-from: #1e293b;
+  --header-to: #334155;
+  --header-fg: #f8fafc;
+  --footer-from: #0f172a;
+  --footer-to: #1e293b;
+  --band-muted: #f1f5f9;
+  --band-muted-end: #e2e8f0;
+  --shadow-soft: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--highlight);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.2);
+}
+
+@layer components {
+  .sm-container {
+    @apply mx-auto w-full max-w-content px-4 sm:px-6;
+  }
+
+  .sm-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition;
+  }
+
+  .sm-btn-primary {
+    @apply sm-btn bg-accent-deep text-white hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .sm-btn-secondary {
+    @apply sm-btn border border-line bg-white text-ink hover:bg-mist disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .sm-btn-ghost {
+    @apply sm-btn text-mute hover:bg-mist hover:text-ink;
+  }
+
+  .sm-input {
+    @apply w-full rounded-lg border border-line bg-white px-3 py-2.5 text-sm text-ink placeholder:text-soft outline-none transition focus:border-highlight;
+    font-family: inherit;
+  }
+
+  .sm-label {
+    @apply mb-1.5 block text-xs font-medium uppercase tracking-[0.08em] text-mute;
+  }
+
+  .sm-card {
+    @apply rounded-xl border border-line bg-white;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .sm-chip {
+    @apply inline-flex items-center rounded-full border border-line bg-mist px-2.5 py-0.5 text-xs text-mute;
+  }
+
+  .sm-badge-sample {
+    @apply inline-flex items-center rounded-full border border-mute bg-accent text-white px-2.5 py-0.5 text-[10px] uppercase tracking-wide;
+  }
+
+  .sm-choice {
+    @apply rounded-lg border border-line bg-white px-4 py-3 text-sm text-mute transition hover:border-highlight/40 hover:text-ink;
+  }
+
+  .sm-choice-active {
+    @apply border-highlight bg-blue-50 text-highlight-deep font-medium;
+  }
+
+  .sm-heading {
+    @apply text-ink tracking-tight font-semibold;
+  }
+
+  .sm-wordmark {
+    @apply font-semibold tracking-tight text-ink;
+  }
+
+  .sm-header-bar {
+    background: linear-gradient(180deg, var(--header-to) 0%, var(--header-from) 100%);
+    color: var(--header-fg);
+  }
+
+  .sm-footer-bar {
+    background: linear-gradient(180deg, var(--footer-to) 0%, var(--footer-from) 100%);
+    color: var(--header-fg);
+  }
+
+  .sm-band-orange {
+    background: linear-gradient(180deg, var(--band-muted) 0%, var(--band-muted-end) 100%);
+  }
+
+  .sm-band-sky {
+    background: var(--band-muted);
+  }
+
+  .sm-btn-on-brand {
+    @apply sm-btn rounded-lg border border-white/20 bg-white text-accent-deep hover:bg-mist disabled:cursor-not-allowed disabled:opacity-40 px-5 py-3 text-base font-semibold;
+  }
+
+  .sm-btn-on-brand-ghost {
+    @apply sm-btn rounded-lg border border-white/30 bg-white/10 text-white hover:bg-white/20 px-5 py-3 text-base;
+  }
+}
