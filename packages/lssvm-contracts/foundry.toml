@@ -5,7 +5,7 @@ remappings = [
   "@manifoldxyz/=lib/",
   "manifoldxyz/=lib/royalty-registry-solidity/contracts/",
   "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
-  "@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/",
+  "@openzeppelin/contracts-upgradeable/=lib/royalty-registry-solidity/lib/openzeppelin-contracts-upgradeable/contracts/",
   "create3-factory/=lib/create3-factory/src/",
   "solmate/=lib/solmate/src/",
   "@prb/math/=lib/prb-math/src/",
@@ -30,3 +30,6 @@ verbosity = 4
 ffi = true
 solc_version = '0.8.26'
 evm_version = 'cancun'
+
+[rpc_endpoints]
+base_sepolia = "https://sepolia.base.org"

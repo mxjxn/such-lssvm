@@ -1,5 +1,5 @@
 @manifoldxyz/=lib/
-@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
+@openzeppelin/contracts-upgradeable/=lib/royalty-registry-solidity/lib/openzeppelin-contracts-upgradeable/contracts/
 @openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
 @prb/math/=lib/prb-math/src/
 clones-with-immutable-args/=lib/clones-with-immutable-args/src/

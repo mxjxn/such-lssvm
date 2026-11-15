@@ -38,8 +38,12 @@ if [ -z "$RPC_URL" ] || [ -z "$PRIVATE_KEY" ]; then
     exit 1
 fi
 
-# Factory address (from Base deployment)
-FACTORY_ADDRESS="0xF6B4bDF778db19DD5928248DE4C18Ce22E8a5f5e"
+# Factory address — set in .env.local (e.g. FACTORY_ADDRESS=0x...)
+FACTORY_ADDRESS="${FACTORY_ADDRESS:-}"
+if [ -z "$FACTORY_ADDRESS" ]; then
+    echo "Error: FACTORY_ADDRESS must be set in .env.local"
+    exit 1
+fi
 
 # Ethereum Mainnet addresses (to remove)
 ETH_LINEAR_CURVE="0xe5d78fec1a7f42d2F3620238C498F088A866FdC5"

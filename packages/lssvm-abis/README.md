@@ -57,18 +57,15 @@ const poolData = await client.readContract({
 ### Address Helpers
 - `getRouterAddress(chainId)` - Get router address for a chain
 - `getFactoryAddress(chainId)` - Get factory address for a chain
-- `getBondingCurveAddress(chainId, curveType)` - Get bonding curve address
+- `getBondingCurveAddress(chainId, curveType)` - Get bonding curve address (consumer must configure addresses; see `addresses.example.ts`)
+
+This package does **not** ship production deployment addresses. Wire your factory, router, and curves via app env (`apps/web/.env.example`) or populate `CONTRACT_ADDRESSES` / `BONDING_CURVES` at runtime in your integration.
 
 ### Types
 - `PoolType` - Enum for pool types (NFT, TOKEN, TRADE)
 - `CurveError` - Error types for curve operations
 - `PoolData` - Type for pool data structure
 - `BuyNFTQuote`, `SellNFTQuote` - Quote types for NFT trades
-
-## Supported Chains
-
-- **Base Mainnet** (8453)
-- **Base Sepolia Testnet** (84532)
 
 ## License
 

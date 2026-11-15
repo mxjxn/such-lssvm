@@ -1,0 +1,5 @@
+{
+  "installCommand": "cd ../.. && pnpm install",
+  "buildCommand": "cd ../.. && pnpm --filter @mxjxn/lssvm-abis build && pnpm --filter @lssvm/web build",
+  "framework": "nextjs"
+}

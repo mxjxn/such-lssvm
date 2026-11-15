@@ -3,10 +3,10 @@ import { CONFIG } from './config'
 import {
   getRouterAddress as getRouterAddressFromAbis,
   getFactoryAddress as getFactoryAddressFromAbis,
-} from '@lssvm/abis'
+} from '@mxjxn/lssvm-abis'
 
-// Re-export everything from @lssvm/abis for backward compatibility
-export * from '@lssvm/abis'
+// Re-export everything from @mxjxn/lssvm-abis for backward compatibility
+export * from '@mxjxn/lssvm-abis'
 
 // Contract addresses - these should be set via environment variables
 // Format: NEXT_PUBLIC_ROUTER_ADDRESS_8453 for Base mainnet (chainId 8453)
