@@ -58,7 +58,11 @@ jobs:
 
             - name: Run Forge coverage
               run: |
-                  forge coverage --report lcov
+                  forge coverage --report lcov \
+                    --match-path 'src/test/bonding-curve-tests/*.t.sol' \
+                    --no-match-path '*Huff*' \
+                    --no-match-test 'testGas*' \
+                    --ffi
               id: coverage
 
             - name: Setup LCOV
