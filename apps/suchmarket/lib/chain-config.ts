@@ -38,6 +38,11 @@ function envBigint(key: string, fallback: bigint): bigint {
 function resolveFactory(chainId: number): Address | null {
   if (chainId === 8453) return (CONFIG.FACTORY_ADDRESS_8453 as Address) || envAddr(`NEXT_PUBLIC_FACTORY_ADDRESS_${chainId}`)
   if (chainId === 84532) return (CONFIG.FACTORY_ADDRESS_84532 as Address) || envAddr(`NEXT_PUBLIC_FACTORY_ADDRESS_${chainId}`)
+  if (chainId === 1) {
+    const fromEnv = envAddr(`NEXT_PUBLIC_FACTORY_ADDRESS_${chainId}`)
+    const configured = (CONFIG.FACTORY_ADDRESS_1 as string)?.trim()
+    return fromEnv ?? (configured ? (configured as Address) : null)
+  }
   const fromEnv = envAddr(`NEXT_PUBLIC_FACTORY_ADDRESS_${chainId}`)
   if (fromEnv) return fromEnv
   try {
@@ -50,6 +55,11 @@ function resolveFactory(chainId: number): Address | null {
 function resolveRouter(chainId: number): Address | null {
   if (chainId === 8453) return (CONFIG.ROUTER_ADDRESS_8453 as Address) || envAddr(`NEXT_PUBLIC_ROUTER_ADDRESS_${chainId}`)
   if (chainId === 84532) return (CONFIG.ROUTER_ADDRESS_84532 as Address) || envAddr(`NEXT_PUBLIC_ROUTER_ADDRESS_${chainId}`)
+  if (chainId === 1) {
+    const fromEnv = envAddr(`NEXT_PUBLIC_ROUTER_ADDRESS_${chainId}`)
+    const configured = (CONFIG.ROUTER_ADDRESS_1 as string)?.trim()
+    return fromEnv ?? (configured ? (configured as Address) : null)
+  }
   const fromEnv = envAddr(`NEXT_PUBLIC_ROUTER_ADDRESS_${chainId}`)
   if (fromEnv) return fromEnv
   try {

@@ -46,11 +46,13 @@ Set these in the Vercel project for `apps/suchmarket`. No private keys in the ap
 
 ## Ethereum Mainnet (chain `1`)
 
+such.market uses **mxjxn's own LSSVM factory + router** on Ethereum (not sudoswap's canonical deployment). There are no hardcoded mainnet LSSVM addresses in the app — set these after Max deploys (see [`docs/ROADMAP.md`](./docs/ROADMAP.md)).
+
 | Variable | Notes |
 |----------|-------|
 | `NEXT_PUBLIC_ETHEREUM_RPC_URL` | Required for mainnet reads |
-| `NEXT_PUBLIC_ROUTER_ADDRESS_1` | LSSVM router — **required** for mainnet pools |
-| `NEXT_PUBLIC_FACTORY_ADDRESS_1` | LSSVM factory — **required** for mainnet pools |
+| `NEXT_PUBLIC_ROUTER_ADDRESS_1` | **Your** VeryFastRouter — required to enable mainnet pools |
+| `NEXT_PUBLIC_FACTORY_ADDRESS_1` | **Your** LSSVMPairFactory — required for discovery/indexer |
 | `NEXT_PUBLIC_MARKETPLACE_ADDRESS_1` | Default studio proxy; alias `NEXT_PUBLIC_MARKETPLACE_ADDRESS_ETHEREUM` |
 | `INDEXER_FACTORY_START_BLOCK_1` | Set to your factory deployment block |
 | `INDEXER_MARKETPLACE_START_BLOCK_1` | Set to marketplace deployment block |
