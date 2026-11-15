@@ -1,7 +1,7 @@
 # Barter offers — design doc (post-launch)
 
 **Status:** Design only. No implementation in this phase.  
-**Product name:** **Barter offers** (a barter NFT platform inside such.market — not a general barter economy).
+**Product name:** **Barter** in nav; in copy use **barter offers** / **barter NFT platform** (not a general barter economy).
 
 **Settlement:** [Seaport 1.6](https://github.com/ProjectOpenSea/seaport) canonical deployment on **Ethereum (1)**, **Base (8453)**, and **Base Sepolia (84532)**:
 
@@ -14,100 +14,103 @@ Orders are **EIP-712 signed** and fulfilled on-chain via Seaport; such.market ho
 
 ---
 
+## Product decisions (Max)
+
+| # | Decision |
+| --- | --- |
+| 1 | **Dedicated such.market conduit** on each supported chain (deploy via `ConduitController`; sole conduit promoted in UI). |
+| 2 | **Fee recipient & bps:** TBD at launch config; likely **aligned with LSSVM protocol fee settings** (same recipient / similar bps). |
+| 3 | **Fee payer:** **Taker (filler) pays by default**; UI may allow offerer-pays variant when building the order. |
+| 4 | **Holdings index at launch:** **Connected wallets + offerers only** (no global watchlist crawl). |
+| 5 | **Counters:** **Anyone** can post a counteroffer. |
+| 6 | **ETH legs:** Use **WETH** (ERC-20), not native ETH, for all chains in v1. |
+| 7 | **Trait wants:** **Later phase**; metadata from **our own indexed metadata** → token ID set → merkle (not third-party APIs). |
+| 8 | **Zones:** **Launch with `zone = address(0)`**. Custom zones ship **later**, together with **barter metadata standards** for richer offer types. |
+| 9 | **Compliance:** Required — see §Compliance. **Legal review before expanding** allowed barter types beyond Phase 1. |
+| 10 | **Nav label:** **Barter** (not “Trade” / not “Barter offers” in the tab). |
+
+---
+
+## Gradual rollout
+
+**Principle:** Introduce barter **types and metadata standards gradually** so users are not overwhelmed. Each phase adds UI labels, validation rules, and docs for how offers are described off-chain (`order_json` metadata schema version).
+
+| Stage | User-facing scope |
+| --- | --- |
+| **Phase 1 (launch)** | **NFT-for-NFT / token bundles only** — specific ERC-721 / ERC-1155 IDs plus ERC-20 amounts; **WETH** for ETH-denominated value. All-or-nothing fills. |
+| **Later** | Collection-wide criteria, ID merkle sets, partial fills, trait wants (our indexer), custom zones, and additional asset/policy types **after** legal sign-off per stage. |
+
+Downstream sections describe the **full target**; implementation tracks the table above unless a phase note says otherwise.
+
+---
+
 ## 1. Product placement vs pools & auctions
 
 | Surface | Mechanism | User intent |
 | --- | --- | --- |
 | **Pools** | LSSVM + VeryFastRouter | Buy/sell NFTs against pool liquidity (AMM pricing). |
 | **Auctions** | cryptoart.studio marketplace contract | Timed listings, bids, settlement to seller. |
-| **Barter offers** | Seaport 1.6 | Peer offers: “I give bundle A for bundle B” (no pool, no auction clock unless added via zone/expiry). |
+| **Barter** | Seaport 1.6 | Peer barter offers: “I give bundle A for bundle B”. |
 
-**Nav (proposed):** `Explore` · `Pools` · `Auctions` · **Barter offers** · `Create` (stays thin; deep-links to studio where needed).
+**Nav:** `Explore` · `Pools` · `Auctions` · **Barter** · `Create` (thin; studio deep-links where needed).
 
 **Flows:**
 
-- **Make offer:** Connect wallet → build offer bundle + want bundle → sign Seaport order → POST to API → appears under **My offers**.
-- **Fill offer:** Browse **All offers** or **Offers you can fill** → review bundle match → single Seaport `fulfill` / `fulfillAdvanced` tx (taker may counter-sign if required by order type).
-- **Counteroffer:** From offer detail → **Counter** → new bundle + new signature → stored with `parent_offer_id` → thread in UI.
-- **Cross-links:** Pool/collection pages show “Open barter offers” for that contract; auction pages do not mix settlement paths (auction stays on marketplace contract).
+- **Make offer:** Connect wallet → build offer bundle + want bundle → sign Seaport order → POST to API → **My offers**.
+- **Fill offer:** **All offers** or **Offers you can fill** → `fulfill` tx via such.market conduit approvals.
+- **Counteroffer:** **Anyone** may **Counter** from offer detail → new signed order, `parent_offer_id` thread.
+- **Cross-links:** Collection pages show open barter offers; auctions stay on marketplace contract only.
 
 ---
 
-## 2. Offer types (all supported, per Max)
+## 2. Offer types (target; rollout per §Gradual rollout)
 
 ### 2.1 Bundle-for-bundle
 
-Both sides are Seaport **offer** and **consideration** item arrays. Supported item types:
+Seaport **offer** and **consideration** item arrays:
 
 | Asset | Seaport item type | Notes |
 | --- | --- | --- |
-| ETH | `NATIVE` / amount in consideration or offer | WETH path avoided on Base where possible; document chain preference. |
-| ERC-20 | `ERC20` | Amount + `token` |
-| ERC-721 | `ERC721` | Specific `identifier` or criteria (below) |
-| ERC-1155 | `ERC1155` | `identifier` + `startAmount` / `endAmount` |
+| **WETH** | `ERC20` | **All “ETH value” legs use WETH** (per Max). Wrap/unwrap UX in flow. |
+| ERC-20 | `ERC20` | Amount + token |
+| ERC-721 | `ERC721` | Specific `identifier` or criteria (post–Phase 1) |
+| ERC-1155 | `ERC1155` | `identifier` + amounts |
 
-**Order shape:** `contract` = Seaport 1.6, `offer` = what offerer gives, `consideration` = what offerer wants (plus optional fee item — §8). Taker fulfills by supplying consideration items (NFTs/tokens/ETH) in the fulfillment call.
+**Phase 1:** Specific IDs + ERC-20/WETH only (no criteria, no partial).
 
-### 2.2 Criteria-based “wants” (and gives)
+### 2.2 Criteria-based “wants” (post–Phase 1)
 
-| Want pattern | Seaport encoding | such.market UI |
+| Want pattern | Seaport encoding | When |
 | --- | --- | --- |
-| **Any token in collection** | Offer or consideration item: `itemType` ERC721/ERC1155 **with criteria**, `identifierOrCriteria` = `0` (collection-wide) or contract-specific rules per Seaport spec | “Any from collection X” |
-| **One of a set of token IDs** | Merkle root in `identifierOrCriteria`; fulfillment includes **proof** | “One of IDs {…}” or uploaded allowlist → we build merkle root client- or server-side |
-| **Traits (feasibility)** | **Not native in Seaport 1.6.** Feasible approach: (1) **metadata indexer** resolves trait → token ID set → **merkle root** over IDs (same as ID set); (2) refresh root when metadata or supply changes; (3) cap collection size / use lazy merkle updates. **V1:** collection-wide + explicit ID sets; **V1.5:** trait → merkle pipeline. | “Has trait T” = derived ID set |
+| Any token in collection | Criteria item, collection-wide | Phase 2+ |
+| Set of token IDs | Merkle root + proof | Phase 2+ |
+| **Traits** | Our **indexed metadata** → ID set → merkle root; refresh when index updates | **Later phase** (after metadata indexer) |
 
-Criteria apply to **either side** (e.g. “I offer any CryptoArt # from this merkle set” or “I want any token from collection Y”).
+### 2.3 Partial fills (post–Phase 1)
 
-### 2.3 Partial fills
-
-- Order field: `allowPartialFills: true` when user opts in; otherwise full fill only.
-- UI: toggle **“Allow partial fill”**; show remaining amounts after fractional fulfillment (track via Seaport order hash + `numerator`/`denominator` on 1155/ERC20 legs).
-- Fulfillment: `fulfillAdvanced` / partial fulfillment API per Seaport 1.6 docs; indexer listens to `OrderFulfilled` and updates `filled_amounts` in Postgres.
+`allowPartialFills` optional; `fulfillAdvanced`; track fill fraction in `barter_fills`. Not in Phase 1.
 
 ### 2.4 Counteroffers
 
-- **On-chain:** Counter = **new** signed order (new salt, nonce); no Seaport parent pointer.
-- **Off-chain:** `barter_offers.parent_offer_id` (nullable FK), `root_offer_id` for threading, `status` (`open` \| `countered` \| `superseded` \| `filled` \| `cancelled` \| `expired`).
-- UX: Offer detail shows chain of counters; maker can accept a counter by filling the counter-order; original order marked `superseded` when maker explicitly replaces or cancels.
+- **On-chain:** New signed order (new salt); no Seaport parent link.
+- **Off-chain:** `parent_offer_id`, `root_offer_id`, status thread.
+- **Policy:** **Any connected user may counter** (not limited to wallets that can fill the want side).
 
 ---
 
 ## 3. Dashboard: “Offers you can fill”
 
-**Goal:** Logged-in user sees offers whose **want** side their wallet can satisfy (holdings + criteria + partial state).
+### 3.1 Holdings index (extends RPC indexer)
 
-### 3.1 Holdings index (extends existing RPC indexer)
+**At launch:** Index balances only for (**a**) wallets that **created a barter offer** on such.market and (**b**) wallets **currently connected** (session-scoped registration in `wallet_watchlist`). **No** full-chain or arbitrary address crawl.
 
-New tables + cron job (same Postgres as `pools` / `marketplace_listings`):
+Tables: `wallet_balances_erc20`, `wallet_nfts_721`, `wallet_nfts_1155`, `wallet_watchlist`.
 
-1. **Global / subscribed wallets:** Index `Transfer` (ERC-721/1155), `Transfer` (ERC-20), native balance snapshots for wallets that (a) posted offers, (b) connected in last N days (opt-in list in DB), or (c) explicit “watch my wallet” — **no full-chain wallet crawl**.
+**Invalidation:** Transfer logs since cursor; cancel/expiry/fill; **re-validate** via RPC before fill CTA.
 
-2. **Tables (sketch):** `wallet_balances_erc20`, `wallet_nfts_721`, `wallet_nfts_1155` — `(chain_id, wallet, token, token_id, amount, updated_at)`.
+### 3.2–3.3 Want denormalization & match
 
-3. **Invalidation:** On each indexer tick, process new logs since cursor; on `Transfer`, update balances; on offer **cancel/expiry/fill**, remove from match set; before fill CTA, **re-validate** via RPC `balanceOf` / `ownerOf` (stale index guard).
-
-### 3.2 Want-side denormalization
-
-`barter_offer_wants` — one row per atomic want leg, flattened from signed order:
-
-- `offer_id`, `chain_id`, `item_type`, `token`, `token_id` (nullable), `criteria_root` (nullable), `amount_min`, `amount_max`, `partial_ok`.
-
-### 3.3 Match query (simplified)
-
-For wallet `W`:
-
-```sql
--- Pseudologic: specific ID wants
-SELECT o.* FROM barter_offers o
-JOIN barter_offer_wants w ON w.offer_id = o.id
-JOIN wallet_nfts_721 h ON h.chain_id = w.chain_id AND h.wallet = $W
-  AND h.token = w.token AND h.token_id = w.token_id
-WHERE o.status = 'open' AND o.expires_at > now();
-
--- Criteria / merkle: candidate filter in SQL (collection + root), then verify proof in app worker or at fill time
-```
-
-**Performance:** Partial indexes on `(chain_id, status, expires_at)`; materialized view `offer_match_candidates(chain_id, wallet, offer_id)` refreshed post-sync for connected users only.
+`barter_offer_wants` for SQL prefilter; merkle/criteria verification at fill time when enabled. Match materialization for **connected** wallets after indexer sync.
 
 ---
 
@@ -115,14 +118,11 @@ WHERE o.status = 'open' AND o.expires_at > now();
 
 | Concern | Approach |
 | --- | --- |
-| **Storage** | Postgres: full EIP-712 struct + signature bytes + `order_hash`, `chain_id`, `offerer`, timestamps, status, JSON mirror of offer/consideration for API speed. |
-| **API routes (sketch)** | `POST /api/barter/offers` (create signed), `GET /api/barter/offers`, `GET /api/barter/offers/:id`, `GET /api/barter/offers/match?wallet=`, `POST /api/barter/offers/:id/cancel` (records cancel + on-chain `cancel` tx hash), `POST /api/barter/counters`, `GET /api/barter/offers/:id/thread`. |
-| **Validation on ingest** | Recover signer = offerer; domain matches chain + Seaport 1.6; `counter` matches on-chain `getCounter(offerer)` (RPC); `startTime`/`endTime` sane; zone address allowed list (future). |
-| **Fulfillability** | Background job + pre-fill RPC: approvals/conduit, balances, not cancelled, not fully filled, `block.timestamp` within window. Expose `fulfillable: boolean` + `reason` on read API. |
-| **Cancellation** | On-chain `incrementCounter` or order-specific cancel; store `cancel_tx`, set `status=cancelled`; hide from match index immediately. |
-| **Nonce / counter** | Seaport **counter** per offerer (not JSON nonce); UI reads `getCounter` before sign; after cancel/increment, reject stale signatures. |
-
-**Source of truth:** On-chain Seaport state wins on conflict; DB is cache for browse/match.
+| **Storage** | Postgres: EIP-712 + signature + `order_hash`, status, `order_json`, metadata schema version. |
+| **API routes (sketch)** | `POST/GET /api/barter/offers`, `match`, `cancel`, `counters`, `thread`. |
+| **Validation** | Signer, counter, times; **ingest rejects unknown zones** until custom zones launch; contract blocklist (§Compliance). |
+| **Fulfillability** | Conduit + WETH/ERC-20 approvals, balances, not cancelled. |
+| **Cancellation / counter** | On-chain counter increment; DB status. |
 
 ---
 
@@ -130,155 +130,134 @@ WHERE o.status = 'open' AND o.expires_at > now();
 
 | Goal | Design |
 | --- | --- |
-| **One approval per collection** | Recommend **such.market conduit** (deployed via `ConduitController`, Max-owned) — users `setApprovalForAll(collection, conduit)` once per chain. |
-| **Conduit choice** | Default: platform conduit. Power users: “use existing OpenSea conduit” only if we explicitly support that conduit key (document security tradeoff). |
-| **ERC-20** | `approve(seaport, amount)` or max; batch UI “approve all tokens in this offer”. |
-| **ETH** | No approval; offerer/taker sends value in fulfillment. |
-| **Pain reduction** | Pre-offer **readiness panel**: green/yellow per asset; link to single multicall approve tx where possible; persist “approved collections” in localStorage + optional server flag (not authority). |
+| **One approval per collection** | **such.market conduit only** (per chain, Max deploys). `setApprovalForAll(collection, suchMarketConduit)`. |
+| **WETH / ERC-20** | `approve(Seaport, …)` or max; batch in readiness panel. |
+| **Pain reduction** | Pre-flight readiness; multicall where possible. |
+
+No third-party conduit keys in product UI.
 
 ---
 
-## 6. Zones & future conditions (forward-looking)
+## 6. Zones & future conditions
 
-Seaport **zone** on the order can enforce extra rules at fill time:
+**Launch:** `zone = address(0)` for all barter orders.
 
-| Condition | Zone pattern |
-| --- | --- |
-| Expiry / time windows | Already in order `startTime`/`endTime`; zone optional for stricter clocks. |
-| Allowlisted takers | Custom zone: `authorizeOrder` / `validateOrder` only passes for `fulfiller ∈ allowlist`. |
-| Restricted resale / hold period | Zone tied to transfer hook or off-chain policy (heavy); defer. |
-| such.market fee enforcement | Zone + fee item in consideration (§8). |
-
-**Phase 1:** `zone = address(0)` (open fulfillment). **Phase 4:** deploy `SuchMarketBarterZone` — allowlist + optional “studio only” takers for curated barter.
+**Later:** Custom **SuchMarket** zone(s) ship with **barter metadata standards** (expiry extensions, allowlisted takers, fee enforcement). Not coupled to Phase 1.
 
 ---
 
 ## 7. DB schema sketch
 
+(Unchanged structurally; add fields as needed for compliance/spam: `hidden_by_admin`, `reputation_tier`, `metadata_schema_version`.)
+
 ```sql
--- Orders (off-chain book)
 CREATE TABLE barter_offers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   chain_id INT NOT NULL,
   order_hash TEXT NOT NULL UNIQUE,
   offerer TEXT NOT NULL,
-  counterparty TEXT,           -- optional restrict (rare)
   seaport_address TEXT NOT NULL,
-  zone TEXT,
-  salt TEXT NOT NULL,
-  counter BIGINT NOT NULL,
-  start_time BIGINT NOT NULL,
-  end_time BIGINT NOT NULL,
-  allow_partial_fills BOOLEAN NOT NULL DEFAULT false,
-  status TEXT NOT NULL,
-  parent_offer_id UUID REFERENCES barter_offers(id),
-  root_offer_id UUID REFERENCES barter_offers(id),
-  signature BYTEA NOT NULL,
-  order_json JSONB NOT NULL,   -- full Seaport order
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  cancel_tx TEXT,
-  fill_tx TEXT
+  zone TEXT NOT NULL DEFAULT '0x0000000000000000000000000000000000000000',
+  -- ... status, parent_offer_id, signature, order_json, fee_payer enum, etc.
 );
 
-CREATE TABLE barter_offer_items (
+CREATE TABLE barter_policy_blocklist (
+  chain_id INT,
+  contract_address TEXT,
+  reason TEXT,
+  PRIMARY KEY (chain_id, contract_address)
+);
+
+CREATE TABLE barter_reports (
   id BIGSERIAL PRIMARY KEY,
-  offer_id UUID NOT NULL REFERENCES barter_offers(id) ON DELETE CASCADE,
-  side TEXT NOT NULL CHECK (side IN ('offer', 'consideration')),
-  item_type SMALLINT NOT NULL,
-  token TEXT NOT NULL,
-  identifier NUMERIC,
-  criteria_root TEXT,
-  start_amount NUMERIC NOT NULL,
-  end_amount NUMERIC NOT NULL,
-  sort_index INT NOT NULL
+  offer_id UUID REFERENCES barter_offers(id),
+  reporter TEXT,
+  reason TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
 );
-
-CREATE TABLE barter_offer_wants (
-  offer_id UUID NOT NULL REFERENCES barter_offers(id) ON DELETE CASCADE,
-  -- denormalized want legs for matching (mirror consideration or offer side per "who fills")
-  ...
-);
-
-CREATE TABLE barter_fills (
-  id BIGSERIAL PRIMARY KEY,
-  offer_id UUID NOT NULL REFERENCES barter_offers(id),
-  filler TEXT NOT NULL,
-  tx_hash TEXT NOT NULL,
-  numerator INT,
-  denominator INT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
--- Holdings (indexer extension)
-CREATE TABLE wallet_nfts_721 (...);
-CREATE TABLE wallet_nfts_1155 (...);
-CREATE TABLE wallet_balances_erc20 (...);
-CREATE TABLE wallet_watchlist (chain_id INT, wallet TEXT, PRIMARY KEY (chain_id, wallet));
-
-CREATE INDEX idx_barter_offers_open ON barter_offers (chain_id, status, end_time);
-CREATE INDEX idx_barter_offer_items_token ON barter_offer_items (chain_id, token, identifier);
 ```
 
-`indexer_cursors` gains keys e.g. `seaport_order_fulfilled`, `wallet_transfers_721`.
+See §Anti-spam for `barter_wallet_mutes`, rate-limit audit table.
 
 ---
 
 ## 8. Fees
 
-- **Model:** Additional **consideration** item (ERC-20 or ETH) payable to **such.market fee recipient**, configured per chain (env / admin config — not in this doc’s scope).
-- **Who pays:** Default — **taker** (filler) pays fee on top of want bundle, or **offerer** reduces consideration via UI toggle (encoded in order at sign time).
-- **Amount:** Basis points on “notional” — for NFT-NFT barter, use user-declared **floor estimate** or USD input for display only; on-chain fee is fixed token amount from builder.
-- **Config table:** `barter_fee_config(chain_id, fee_recipient, bps, min_fee_wei, enabled)` — Max sets recipient addresses.
-
-Seaport does not extract protocol fee automatically; fee is enforced as an explicit consideration leg (and optionally zone validation later).
+- **Consideration leg** to such.market **fee recipient** (WETH or ERC-20).
+- **Recipient & bps:** **TBD**; config should **mirror LSSVM `protocolFeeRecipient` / multiplier** where practical (`barter_fee_config` per chain).
+- **Default payer:** **Taker**; configurable at order build (offerer pays = encoded in consideration layout).
+- On-chain fee is explicit in the signed order, not a Seaport protocol hook.
 
 ---
 
-## 9. Risks
+## 9. Compliance & disallowed items
+
+Compliance is **in scope from day one**, even when Phase 1 types are narrow.
+
+| Control | Description |
+| --- | --- |
+| **Contract blocklist** | Postgres + config: banned **token/NFT contract addresses** per chain; reject at API ingest and hide in list APIs. |
+| **Category policy** | Disallowed categories (e.g. unregistered securities, sanction-linked assets, stolen/scam labels) — enumerated in internal policy doc; **legal review** before enabling new categories or ERC-20 barter beyond allowlist. |
+| **Report** | UI **Report** on offer detail → `barter_reports`; moderation queue (off-chain). |
+| **Admin hide/delist** | Admin flag `hidden` / `delisted` on `barter_offers`; hidden offers cannot be fulfilled via such.market UI/API (on-chain order may still exist until cancelled). |
+| **Expansion gate** | **No new barter type or metadata standard** in production without **legal review** (traits, permissive ERC-20, partial fills, zones, etc.). |
+
+Phase 1 reduces risk by limiting to **specific NFT IDs + allowlisted ERC-20/WETH** where policy requires.
+
+---
+
+## 10. Anti-spam
+
+| Measure | Notes |
+| --- | --- |
+| **Dust filter** | Minimum notional per offer (WETH/allowlisted ERC-20 floor and/or NFT count rules); reject below threshold at API. |
+| **Rate limits** | Per-wallet cap on **new offers / hour** (and counters if abusive); HTTP 429 + soft warn in UI. |
+| **Default dashboard filters** | Hide offers from **unknown/low-reputation** wallets and **collections not on allowlist**; user toggle **“Show all offers”** (persisted). |
+| **Mute / block** | Wallet can mute offerers; muted hidden from feed and match (per-user, stored server-side). |
+| **Stake / deposit (later)** | Optional small **refundable deposit** on offer creation to raise cost of spam — design TBD, not Phase 1. |
+
+Reputation and collection allowlists tie to studio/cryptoart.social curation over time.
+
+---
+
+## 11. Risks
 
 | Risk | Mitigation |
 | --- | --- |
-| Stale match index leads to failed txs | Re-validate balances immediately before `fulfill`; show “last indexed at”. |
-| Criteria merkle wrong / outdated | Version merkle roots; show root hash in UI; reject fills when proof fails. |
-| Trait wants misleading | Label as “ID set derived from metadata”; refresh job + disclaimer. |
-| Partial fill accounting bugs | Index `OrderFulfilled` carefully; unit tests against Seaport test vectors. |
-| Conduit / approval phishing | Only promote such.market conduit address in UI; block unknown zones in v1 ingest. |
-| Legal / sanctions | Off-chain policy + optional zone allowlist (Max/compliance). |
-| RPC load | Bound wallet watchlist; no chain-wide holdings scan. |
+| Stale match index | Re-validate before `fulfill`. |
+| Merkle / criteria errors | Version roots; fail closed on bad proofs. |
+| Conduit phishing | Single official conduit address per chain in UI. |
+| Compliance gaps | Blocklist + legal gate on type expansion (§9). |
+| Spam / noise | §10 filters + rate limits. |
+| RPC load | Connected + offerers only at launch. |
 
 ---
 
-## 10. Phased build plan
+## 12. Phased build plan
 
-| Phase | Scope | Depends on |
-| --- | --- | --- |
-| **0** | This doc + ROADMAP link | — |
-| **1a** | Fixed bundle ↔ bundle, all-or-nothing, sign + POST + list + fulfill, ETH/721/1155/20 | Postgres, Seaport SDK, conduit address |
-| **1b** | Cancel, counter read, basic fees (consideration leg) | Fee recipient per chain |
-| **2** | Criteria (collection + ID merkle), partial fills | Merkle builder, `fulfillAdvanced` |
-| **3** | Counteroffers + thread UI; “Offers you can fill” v1 | Holdings tables, match job |
-| **4** | Trait → merkle pipeline; custom zone (allowlist, taker restrictions) | Metadata indexer, zone deploy (**Max**) |
+| Phase | Scope |
+| --- | --- |
+| **0** | This doc + ROADMAP |
+| **1** | **Barter** nav; NFT↔NFT/token bundles, WETH, dedicated conduit, zone=0, order book API, cancel, **anyone counters**, compliance v1 (blocklist, report, admin hide), anti-spam v1 (dust, rate limit, default filters), taker-pays fee leg (recipient/bps TBD), holdings for connected + offerers |
+| **2** | Criteria (collection + ID merkle), partial fills |
+| **3** | “Offers you can fill” polish; counter threads |
+| **4** | Trait wants (our metadata indexer); custom zones + metadata standards |
 
 ---
 
-## 11. Open questions for Max
+## 13. Open questions for Max
 
-1. **Conduit:** Deploy a dedicated such.market conduit on each chain, or reuse an existing conduit key?
-2. **Fee recipient & default bps** per chain (ETH vs USDC on Base)?
-3. **Who pays fee** by default — offerer or taker?
-4. **Wallet indexing scope:** Only connected wallets + offerers, or allow “email me matches” with watchlist?
-5. **Counters:** Anyone can counter, or only users who can already fill the want side?
-6. **WETH:** Require WETH for ETH-denominated legs on all chains, or native ETH only where Seaport allows?
-7. **Trait wants:** Minimum metadata source (studio API vs OpenSea-style indexer vs on-chain only)?
-8. **Zone deploy:** Timeline for allowlisted-taker zone vs shipping zone=0?
-9. **Legal:** Any barter offer types to disallow (e.g. unregistered securities tokens)?
-10. **Brand:** Tab name “Barter offers” vs “Trade” to avoid confusion with pool **Trade** panel?
+1. **Fee numbers:** Final **bps** and whether barter always shares **exact** LSSVM `protocolFeeRecipient` per chain when those addresses exist.
+2. **Phase 1 ERC-20 allowlist:** Which tokens besides WETH are allowed on Base / Ethereum at launch?
+3. **Collection allowlist:** Who maintains the curated collection list for default dashboard filters (studio vs manual admin)?
+4. **Moderation:** Process for `barter_reports` (SLA, roles) and linkage to on-chain cancel requests.
+5. **Refundable deposit:** If pursued post-launch, amount, token, and refund conditions.
+6. **Legal review checklist:** Sign-off template before enabling Phase 2+ features.
 
 ---
 
 ## References
 
-- Seaport 1.6 repo & deployment table: [ProjectOpenSea/seaport](https://github.com/ProjectOpenSea/seaport)
-- Existing indexer: `apps/suchmarket/indexer/schema/001_initial.sql`
-- ROADMAP: [ROADMAP.md](./ROADMAP.md)
+- [ProjectOpenSea/seaport](https://github.com/ProjectOpenSea/seaport)
+- `apps/suchmarket/indexer/schema/001_initial.sql`
+- [ROADMAP.md](./ROADMAP.md)

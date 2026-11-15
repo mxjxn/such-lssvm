@@ -98,7 +98,7 @@ Agents do **not** run broadcast or touch `.env*` files.
 
 ## Barter offers (post-launch)
 
-Peer **bundle-for-bundle** trading on **Seaport 1.6** (canonical address on Base, Base Sepolia, Ethereum). Post–Sepolia/mainnet LSSVM + auction polish. Design: **[BARTER_OFFERS.md](./BARTER_OFFERS.md)** (off-chain order book, criteria wants, partial fills, counters, match dashboard, fees, phases).
+Peer **bundle-for-bundle** trading on **Seaport 1.6** (nav: **Barter**). Post–Sepolia/mainnet LSSVM + auction polish. Design: **[BARTER_OFFERS.md](./BARTER_OFFERS.md)** (gradual rollout; Phase 1 NFT/token bundles; compliance & anti-spam).
 
 | Step | Owner |
 | --- | --- |
