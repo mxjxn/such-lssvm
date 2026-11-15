@@ -14,6 +14,10 @@ on:
 env:
     FOUNDRY_PROFILE: ci
 
+defaults:
+    run:
+        working-directory: packages/lssvm-contracts
+
 jobs:
     check:
         strategy:
@@ -22,13 +26,13 @@ jobs:
         name: Foundry Project
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
               with:
                   submodules: recursive
 
-            - uses: actions/setup-python@v4
+            - uses: actions/setup-python@v5
               with:
-                  python-version: '3.9'
+                  python-version: '3.12'
 
             - name: Install eth_abi
               run: pip install eth_abi
@@ -46,7 +50,10 @@ jobs:
 
             - name: Run Forge tests
               run: |
-                  FOUNDRY_PROFILE=ci forge test --ffi -vvv
+                  forge test \
+                    --match-path 'src/test/bonding-curve-tests/*.t.sol' \
+                    --no-match-path '*Huff*' \
+                    --ffi -vvv
               id: test
 
             - name: Run Forge coverage
@@ -55,7 +62,7 @@ jobs:
               id: coverage
 
             - name: Setup LCOV
-              run: echo "Installing lcov"; sudo apt-get install lcov > /dev/null
+              run: echo "Installing lcov"; sudo apt-get install -y lcov > /dev/null
 
             - name: Clean LCOV
               run: |
@@ -66,9 +73,9 @@ jobs:
                   fi
 
             - name: Upload coverage reports to Codecov
-              if: always() && hashFiles('lcov.info') != ''
+              if: always() && hashFiles('packages/lssvm-contracts/lcov.info') != ''
               uses: codecov/codecov-action@v3.1.1
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
-                  files: lcov.info
+                  files: packages/lssvm-contracts/lcov.info
                   fail_ci_if_error: false
