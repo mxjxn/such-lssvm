@@ -71,7 +71,8 @@ jobs:
             - name: Clean LCOV
               run: |
                   if [ -f lcov.info ]; then
-                      lcov --remove lcov.info -o lcov.info 'src/mocks/*' 'src/test/*' 'src/testgen-scripts/*' 'src/lib/*' 'script/*'
+                      # lcov may exit 25 when filters match only partially; report is still usable.
+                      lcov --remove lcov.info -o lcov.info 'src/mocks/*' 'src/test/*' 'src/testgen-scripts/*' 'src/lib/*' 'script/*' || true
                   else
                       echo "lcov.info not found, skipping cleanup"
                   fi
