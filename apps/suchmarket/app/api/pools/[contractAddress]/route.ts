@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Address, isAddress } from 'viem'
-import { discoverPools } from '@/lib/indexer'
+import { queryPools } from '@/lib/indexer'
 import { isSupportedChainId } from '@/lib/chains'
 
 const cache = new Map<string, { data: unknown; timestamp: number }>()
@@ -31,7 +31,7 @@ export async function GET(
       return NextResponse.json({ pools: cached.data })
     }
 
-    const pools = await discoverPools({
+    const { pools } = await queryPools({
       chainId,
       nftContract: contractAddress as Address,
       lookbackBlocks: 400_000n,

@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider, createConfig, http } from 'wagmi'
-import { base, baseSepolia } from 'wagmi/chains'
+import { base, baseSepolia, mainnet } from 'wagmi/chains'
 import { injected } from 'wagmi/connectors'
 import { useState, useEffect } from 'react'
 import { farcasterFrame } from '@farcaster/miniapp-wagmi-connector'
@@ -20,10 +20,11 @@ const queryClient = new QueryClient({
 })
 
 export const config = createConfig({
-  chains: [base, baseSepolia],
+  chains: [base, baseSepolia, mainnet],
   transports: {
     [base.id]: http(CONFIG.BASE_RPC_URL),
     [baseSepolia.id]: http(CONFIG.BASE_SEPOLIA_RPC_URL),
+    [mainnet.id]: http(CONFIG.ETHEREUM_RPC_URL),
   },
   connectors: [injected({ shimDisconnect: true }), farcasterFrame()],
 })

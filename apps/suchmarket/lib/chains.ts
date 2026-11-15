@@ -1,24 +1,36 @@
-import { base, baseSepolia } from 'viem/chains'
+import { base, baseSepolia, mainnet } from 'viem/chains'
 import { Address } from 'viem'
 import { BONDING_CURVES } from '@mxjxn/lssvm-abis'
+import { ALL_CHAIN_CONFIGS, getChainConfig } from './chain-config'
 
-export const SUPPORTED_CHAINS = [base, baseSepolia] as const
+export const SUPPORTED_CHAINS = [base, baseSepolia, mainnet] as const
 export type SupportedChainId = (typeof SUPPORTED_CHAINS)[number]['id']
 
 export const DEFAULT_CHAIN_ID: SupportedChainId = base.id
+
+/** Chains enabled in the UI (factory or marketplace configured). */
+export function getEnabledChainIds(): SupportedChainId[] {
+  const ids = ALL_CHAIN_CONFIGS.filter(
+    (c) => c.factoryAddress || c.marketplaceAddress
+  ).map((c) => c.id)
+  return ids.filter((id): id is SupportedChainId => isSupportedChainId(id))
+}
 
 /** Launch focuses on Linear; other curves remain available for later. */
 export const LAUNCH_CURVE = 'LINEAR' as const
 export type CurveType = 'LINEAR' | 'EXPONENTIAL' | 'XYK' | 'GDA'
 
 export function isSupportedChainId(chainId: number): chainId is SupportedChainId {
-  return chainId === base.id || chainId === baseSepolia.id
+  return chainId === base.id || chainId === baseSepolia.id || chainId === mainnet.id
 }
 
 export function getChainName(chainId: number): string {
-  if (chainId === base.id) return 'Base'
-  if (chainId === baseSepolia.id) return 'Base Sepolia'
-  return `Chain ${chainId}`
+  return getChainConfig(chainId)?.name ?? `Chain ${chainId}`
+}
+
+export function isChainOperational(chainId: number): boolean {
+  const cfg = getChainConfig(chainId)
+  return Boolean(cfg?.factoryAddress || cfg?.marketplaceAddress)
 }
 
 export function getCurveType(chainId: number, bondingCurve: Address): CurveType | 'UNKNOWN' {

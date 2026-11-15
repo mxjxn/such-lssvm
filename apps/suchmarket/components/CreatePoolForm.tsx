@@ -8,6 +8,11 @@ import { ERC20_ABI } from '@/lib/contracts'
 import { getPublicClient } from '@/lib/wagmi'
 import { useERC1155TokenInfo } from '@/hooks/useERC1155TokenInfo'
 import { useQuery } from '@tanstack/react-query'
+import {
+  DEFAULT_DELTA,
+  DEFAULT_POOL_FEE_BPS,
+  DEFAULT_SPOT_PRICE,
+} from '@/lib/trader-defaults'
 
 export interface CreatePoolFormData {
   nftType: 'ERC721' | 'ERC1155'
@@ -48,9 +53,9 @@ export function CreatePoolForm({ chainId, onSubmit, isSubmitting = false, error,
     nftContract: initialData?.nftContract || ('' as Address),
     erc20Token: initialData?.erc20Token || null,
     bondingCurve: initialData?.bondingCurve || 'LINEAR',
-    spotPrice: initialData?.spotPrice || '0.002',
-    delta: initialData?.delta || '0.01',
-    fee: initialData?.fee || '100', // 1% default fee
+    spotPrice: initialData?.spotPrice || DEFAULT_SPOT_PRICE,
+    delta: initialData?.delta || DEFAULT_DELTA,
+    fee: initialData?.fee || String(DEFAULT_POOL_FEE_BPS),
     initialNFTIds: initialData?.initialNFTIds || '',
     nftId: initialData?.nftId || '0',
     initialNFTBalance: initialData?.initialNFTBalance || '0',

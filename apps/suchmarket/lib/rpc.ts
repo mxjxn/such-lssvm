@@ -1,22 +1,16 @@
 import { createPublicClient, http } from 'viem'
-import { base, baseSepolia } from 'viem/chains'
-import { CONFIG } from './config'
+import { getChainConfig } from './chain-config'
+import { isSupportedChainId } from './chains'
 
 /** Server- and client-safe public client (no 'use client'). */
 export function getPublicClient(chainId: number) {
-  if (chainId === base.id) {
-    return createPublicClient({
-      chain: base,
-      transport: http(CONFIG.BASE_RPC_URL),
-    })
+  if (!isSupportedChainId(chainId)) {
+    throw new Error(`Unsupported chain: ${chainId}`)
   }
-  if (chainId === baseSepolia.id) {
-    return createPublicClient({
-      chain: baseSepolia,
-      transport: http(CONFIG.BASE_SEPOLIA_RPC_URL),
-    })
-  }
-  throw new Error(
-    `Unsupported chain: ${chainId}. Only Base (${base.id}) and Base Sepolia (${baseSepolia.id}) are supported.`
-  )
+  const cfg = getChainConfig(chainId)
+  if (!cfg) throw new Error(`No RPC config for chain ${chainId}`)
+  return createPublicClient({
+    chain: cfg.viemChain,
+    transport: http(cfg.rpcUrl),
+  })
 }

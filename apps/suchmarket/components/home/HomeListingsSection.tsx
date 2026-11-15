@@ -1,10 +1,13 @@
 'use client'
 
 import Link from 'next/link'
+import { useQuery } from '@tanstack/react-query'
+import { useAppChain } from '@/contexts/ChainContext'
 import { SAMPLE_AUCTIONS, type SampleAuction } from '@/lib/homeFixtures'
+import type { AuctionSummary } from '@/lib/auctions-server'
 
 function AuctionCard({ auction, sample }: { auction: SampleAuction; sample?: boolean }) {
-  return (
+  const inner = (
     <div className="relative flex gap-3 border-b-2 border-line/60 last:border-0 py-4 first:pt-0 last:pb-0">
       {auction.imageUrl && (
         <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 border-line bg-mist">
@@ -27,10 +30,46 @@ function AuctionCard({ auction, sample }: { auction: SampleAuction; sample?: boo
       </div>
     </div>
   )
+  if (auction.href && !sample) {
+    return (
+      <Link href={auction.href} className="block hover:bg-mist/40 -mx-2 px-2 rounded-lg transition">
+        {inner}
+      </Link>
+    )
+  }
+  return inner
+}
+
+function liveToSample(a: AuctionSummary): SampleAuction {
+  return {
+    id: `${a.chainId}-${a.listingId}`,
+    title: a.title || `Lot #${a.listingId}`,
+    lotLabel: 'Live auction',
+    currentBid: `${a.hasBid ? a.currentBid : a.reserve} ETH`,
+    endsIn:
+      a.endsAt > 0
+        ? `${Math.max(0, Math.floor((a.endsAt * 1000 - Date.now()) / 3600000))}h`
+        : 'Open',
+    imageUrl: a.imageUrl,
+    href: `/auctions/${a.chainId}/${a.listingId}`,
+  }
 }
 
 export function HomeListingsSection({ preview }: { preview: boolean }) {
-  const auctions = preview ? SAMPLE_AUCTIONS : []
+  const { chainId } = useAppChain()
+  const { data: live } = useQuery({
+    queryKey: ['homeAuctions', chainId],
+    queryFn: async () => {
+      const res = await fetch(`/api/auctions?chainId=${chainId}&limit=4`)
+      if (!res.ok) return []
+      const json = await res.json()
+      return (json.auctions as AuctionSummary[]).map(liveToSample)
+    },
+    enabled: !preview,
+    staleTime: 60_000,
+  })
+
+  const auctions = preview ? SAMPLE_AUCTIONS : live ?? []
 
   return (
     <section className="sm-band-sky border-b-2 border-line">

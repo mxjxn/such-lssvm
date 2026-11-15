@@ -19,6 +19,8 @@ export function getRouterAddress(chainId: number): Address {
     address = CONFIG.ROUTER_ADDRESS_8453 as Address | undefined
   } else if (chainId === 84532) {
     address = CONFIG.ROUTER_ADDRESS_84532 as Address | undefined
+  } else if (chainId === 1 && CONFIG.ROUTER_ADDRESS_1) {
+    address = CONFIG.ROUTER_ADDRESS_1 as Address
   }
   
   // Fallback to direct env access (for other chains or if config didn't work)
@@ -28,7 +30,7 @@ export function getRouterAddress(chainId: number): Address {
   }
   
   // If still no address, use the default from @lssvm/abis
-  if (!address || address === '') {
+  if (!address) {
     try {
       address = getRouterAddressFromAbis(chainId)
     } catch {
@@ -57,6 +59,8 @@ export function getFactoryAddress(chainId: number): Address {
     address = CONFIG.FACTORY_ADDRESS_8453 as Address | undefined
   } else if (chainId === 84532) {
     address = CONFIG.FACTORY_ADDRESS_84532 as Address | undefined
+  } else if (chainId === 1 && CONFIG.FACTORY_ADDRESS_1) {
+    address = CONFIG.FACTORY_ADDRESS_1 as Address
   }
   
   // Fallback to direct env access
@@ -66,7 +70,7 @@ export function getFactoryAddress(chainId: number): Address {
   }
   
   // If still no address, use the default from @lssvm/abis
-  if (!address || address === '') {
+  if (!address) {
     try {
       address = getFactoryAddressFromAbis(chainId)
     } catch {

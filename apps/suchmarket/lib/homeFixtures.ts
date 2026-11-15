@@ -90,6 +90,7 @@ export interface SampleAuction {
   currentBid: string
   endsIn: string
   imageUrl?: string
+  href?: string
 }
 
 export const SAMPLE_AUCTIONS: SampleAuction[] = [

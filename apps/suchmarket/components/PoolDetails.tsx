@@ -154,7 +154,10 @@ export function PoolDetails({
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                    <NFTCard key={i} tokenId={0n} metadata={null} isLoading={true} />
+                    <div
+                      key={i}
+                      className="aspect-square rounded-xl border-2 border-line bg-mist animate-pulse"
+                    />
                   ))}
                 </div>
               </div>
@@ -166,7 +169,11 @@ export function PoolDetails({
                     tokenId={nft.tokenId}
                     metadata={nft.metadata}
                     isLoading={false}
+                    nftContract={nftAddress}
                     poolAddress={poolAddress}
+                    poolType={poolType}
+                    poolVariant={0}
+                    price={spotPrice}
                     chainId={chainId}
                   />
                 ))}

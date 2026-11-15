@@ -23,12 +23,12 @@ export const CONFIG = {
   FACTORY_ADDRESS_8453: process.env.NEXT_PUBLIC_FACTORY_ADDRESS_8453 || HARDCODED_ADDRESSES[8453].FACTORY,
   ROUTER_ADDRESS_84532: process.env.NEXT_PUBLIC_ROUTER_ADDRESS_84532 || HARDCODED_ADDRESSES[84532].ROUTER,
   FACTORY_ADDRESS_84532: process.env.NEXT_PUBLIC_FACTORY_ADDRESS_84532 || HARDCODED_ADDRESSES[84532].FACTORY,
+  ROUTER_ADDRESS_1: process.env.NEXT_PUBLIC_ROUTER_ADDRESS_1 || '',
+  FACTORY_ADDRESS_1: process.env.NEXT_PUBLIC_FACTORY_ADDRESS_1 || '',
   BASE_RPC_URL: process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org',
   BASE_SEPOLIA_RPC_URL: process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC_URL || 'https://sepolia.base.org',
+  ETHEREUM_RPC_URL: process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL || 'https://ethereum.publicnode.com',
   IPFS_URL: process.env.NEXT_PUBLIC_IPFS_URL || 'https://ipfs.io',
-  // Optional legacy subgraph endpoints (explore uses RPC indexer by default)
-  SUBGRAPH_ENDPOINT_8453: process.env.NEXT_PUBLIC_SUBGRAPH_ENDPOINT_8453 || '',
-  SUBGRAPH_ENDPOINT_84532: process.env.NEXT_PUBLIC_SUBGRAPH_ENDPOINT_84532 || '',
 } as const
 
 

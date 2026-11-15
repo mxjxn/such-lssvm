@@ -133,7 +133,7 @@ export function QuantitySelector({
         </div>
       </div>
 
-      {showPrice && pricePerItem && (
+      {showPrice && pricePerItem !== undefined && pricePerItem > 0n && (
         <div className="pt-2 border-t border-gray-200">
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Price per item:</span>

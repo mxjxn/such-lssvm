@@ -512,10 +512,10 @@ export function useCreatePool(chainId: number) {
                   })
                   
                   await client.call({
+                    account: userAddress,
                     to: factoryAddress,
                     data: calldata,
                     value: 0n,
-                    from: userAddress, // Important: set the from address for proper simulation
                   })
                 } catch (callErr: any) {
                   console.log('Direct call also failed:', callErr)

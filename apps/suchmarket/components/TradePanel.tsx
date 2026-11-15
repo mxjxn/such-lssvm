@@ -13,6 +13,7 @@ import {
 } from '@/lib/quotes'
 import { LSSVM_ROUTER_ABI, getRouterAddress, CurveError } from '@/lib/contracts'
 import { TransactionStatus } from '@/components/TransactionStatus'
+import { DEFAULT_SLIPPAGE_BPS } from '@/lib/trader-defaults'
 
 interface TradePanelProps {
   chainId: number
@@ -27,7 +28,8 @@ export function TradePanel({ chainId, poolAddress, isERC1155, poolNftId }: Trade
   const [mode, setMode] = useState<'buy' | 'sell'>('buy')
   const [qty, setQty] = useState(1)
   const [tokenIds, setTokenIds] = useState('')
-  const [slippageBps, setSlippageBps] = useState(100) // 1%
+  const [slippageBps, setSlippageBps] = useState(DEFAULT_SLIPPAGE_BPS)
+  const [buyMode, setBuyMode] = useState<'specific' | 'any'>('any')
 
   const assetId = isERC1155 ? poolNftId ?? 0n : 0n
   const numItems = mode === 'buy' ? qty : tokenIds.split(/[,\s]+/).filter(Boolean).length || qty
@@ -47,12 +49,23 @@ export function TradePanel({ chainId, poolAddress, isERC1155, poolNftId }: Trade
 
   const quote = mode === 'buy' ? buyQuote : sellQuote
   const breakdown = useMemo(() => {
-    if (!quote || quote.error !== CurveError.OK) return null
     if (mode === 'buy') {
-      return buildBuyBreakdown(quote.inputAmount, quote.protocolFee, quote.royaltyAmount, slippageBps)
+      if (!buyQuote || buyQuote.error !== CurveError.OK) return null
+      return buildBuyBreakdown(
+        buyQuote.inputAmount,
+        buyQuote.protocolFee,
+        buyQuote.royaltyAmount,
+        slippageBps
+      )
     }
-    return buildSellBreakdown(quote.outputAmount, quote.protocolFee, quote.royaltyAmount, slippageBps)
-  }, [quote, mode, slippageBps])
+    if (!sellQuote || sellQuote.error !== CurveError.OK) return null
+    return buildSellBreakdown(
+      sellQuote.outputAmount,
+      sellQuote.protocolFee,
+      sellQuote.royaltyAmount,
+      slippageBps
+    )
+  }, [buyQuote, sellQuote, mode, slippageBps])
 
   const { writeContract, data: hash, isPending, error } = useWriteContract()
   const { isLoading: confirming, isSuccess } = useWaitForTransactionReceipt({ hash })
@@ -97,28 +110,49 @@ export function TradePanel({ chainId, poolAddress, isERC1155, poolNftId }: Trade
         return
       }
 
-      if (ids.length === 0) {
-        alert('Enter NFT token IDs to buy (comma-separated). Browse the pool inventory for IDs.')
+      const pairBuyAbi = [
+        {
+          inputs: [
+            { name: 'nftIds', type: 'uint256[]' },
+            { name: 'maxExpectedTokenInput', type: 'uint256' },
+            { name: 'nftRecipient', type: 'address' },
+            { name: 'isRouter', type: 'bool' },
+            { name: 'routerCaller', type: 'address' },
+          ],
+          name: 'swapTokenForSpecificNFTs',
+          outputs: [{ type: 'uint256' }],
+          stateMutability: 'payable',
+          type: 'function',
+        },
+        {
+          inputs: [
+            { name: 'numNFTs', type: 'uint256' },
+            { name: 'maxExpectedTokenInput', type: 'uint256' },
+            { name: 'nftRecipient', type: 'address' },
+            { name: 'isRouter', type: 'bool' },
+            { name: 'routerCaller', type: 'address' },
+          ],
+          name: 'swapTokenForAnyNFTs',
+          outputs: [{ type: 'uint256' }],
+          stateMutability: 'payable',
+          type: 'function',
+        },
+      ] as const
+
+      if (buyMode === 'any' || ids.length === 0) {
+        writeContract({
+          address: poolAddress,
+          abi: pairBuyAbi,
+          functionName: 'swapTokenForAnyNFTs',
+          args: [BigInt(qty), breakdown.withSlippage, address, false, address],
+          value: breakdown.withSlippage,
+        })
         return
       }
 
       writeContract({
         address: poolAddress,
-        abi: [
-          {
-            inputs: [
-              { name: 'nftIds', type: 'uint256[]' },
-              { name: 'maxExpectedTokenInput', type: 'uint256' },
-              { name: 'nftRecipient', type: 'address' },
-              { name: 'isRouter', type: 'bool' },
-              { name: 'routerCaller', type: 'address' },
-            ],
-            name: 'swapTokenForSpecificNFTs',
-            outputs: [{ type: 'uint256' }],
-            stateMutability: 'payable',
-            type: 'function',
-          },
-        ],
+        abi: pairBuyAbi,
         functionName: 'swapTokenForSpecificNFTs',
         args: [ids, breakdown.withSlippage, address, false, address],
         value: breakdown.withSlippage,
@@ -204,7 +238,33 @@ export function TradePanel({ chainId, poolAddress, isERC1155, poolNftId }: Trade
         />
       </div>
 
-      {!isERC1155 && (
+      {!isERC1155 && mode === 'buy' && (
+        <div>
+          <label className="sm-label">Buy mode (ERC-721)</label>
+          <div className="flex rounded-xl border-2 border-line p-0.5 bg-mist/50 mb-3">
+            <button
+              type="button"
+              onClick={() => setBuyMode('any')}
+              className={`flex-1 rounded-lg py-1.5 text-xs ${
+                buyMode === 'any' ? 'bg-white shadow-sm font-medium' : 'text-mute'
+              }`}
+            >
+              Any {qty} NFT{qty > 1 ? 's' : ''}
+            </button>
+            <button
+              type="button"
+              onClick={() => setBuyMode('specific')}
+              className={`flex-1 rounded-lg py-1.5 text-xs ${
+                buyMode === 'specific' ? 'bg-white shadow-sm font-medium' : 'text-mute'
+              }`}
+            >
+              Specific IDs
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!isERC1155 && (mode === 'sell' || buyMode === 'specific') && (
         <div>
           <label className="sm-label">Token IDs (comma-separated)</label>
           <input
@@ -269,11 +329,19 @@ export function TradePanel({ chainId, poolAddress, isERC1155, poolNftId }: Trade
       </button>
 
       {error && <p className="text-xs text-clay">{error.message}</p>}
-      {hash && <TransactionStatus hash={hash} isSuccess={isSuccess} chainId={chainId} />}
+      {hash && (
+        <TransactionStatus
+          status={
+            isPending || confirming ? 'pending' : isSuccess ? 'success' : error ? 'error' : 'pending'
+          }
+          hash={hash}
+          error={error ?? undefined}
+        />
+      )}
 
       <p className="text-[11px] text-soft leading-relaxed">
-        Selling requires approving the pool for your NFTs first. Multi-item buys use the IDs you
-        enter; leave quantity matched to the number of IDs.
+        ERC-721 buys support &ldquo;any N&rdquo; (pool picks inventory) or specific token IDs. Selling
+        requires approving the pool for your NFTs first.
       </p>
     </div>
   )

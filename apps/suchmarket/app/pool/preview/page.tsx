@@ -73,6 +73,23 @@ export default function PoolPreviewPage() {
               <label className="sm-label">Quantity</label>
               <input className="sm-input" defaultValue={1} readOnly />
             </div>
+            <div>
+              <label className="sm-label">Buy mode (ERC-721)</label>
+              <div className="flex rounded-xl border-2 border-line p-0.5 bg-mist/50 mb-3">
+                <button
+                  type="button"
+                  className="flex-1 rounded-lg py-1.5 text-xs bg-white shadow-sm font-medium"
+                >
+                  Any 1 NFT
+                </button>
+                <button
+                  type="button"
+                  className="flex-1 rounded-lg py-1.5 text-xs text-mute"
+                >
+                  Specific IDs
+                </button>
+              </div>
+            </div>
             <div className="rounded-xl bg-mist/80 p-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-mute">You pay</span>

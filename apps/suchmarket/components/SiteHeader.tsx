@@ -2,15 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { base, baseSepolia } from 'viem/chains'
+import { getEnabledChainIds, getChainName, type SupportedChainId } from '@/lib/chains'
 import { WalletButton } from './WalletButton'
 import { useAppChain } from '@/contexts/ChainContext'
 
-const NAV = [
+const NAV: { href: string; label: string; soon?: boolean }[] = [
   { href: '/explore', label: 'Explore' },
   { href: '/create', label: 'Create pool' },
   { href: '/my-pools', label: 'My pools' },
-  { href: '/auctions', label: 'Auctions', soon: true },
+  { href: '/auctions', label: 'Auctions' },
 ]
 
 export function SiteHeader() {
@@ -60,29 +60,21 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2.5">
-          <div className="hidden sm:flex rounded-xl border-2 border-white/40 bg-black/15 p-1">
-            <button
-              type="button"
-              onClick={() => setChainId(base.id)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
-                chainId === base.id
-                  ? 'bg-white text-sky-deep'
-                  : 'text-white/85 hover:bg-white/10 hover:text-white'
-              }`}
-            >
-              Base
-            </button>
-            <button
-              type="button"
-              onClick={() => setChainId(baseSepolia.id)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
-                chainId === baseSepolia.id
-                  ? 'bg-white text-sky-deep'
-                  : 'text-white/85 hover:bg-white/10 hover:text-white'
-              }`}
-            >
-              Sepolia
-            </button>
+          <div className="hidden sm:flex rounded-xl border-2 border-white/40 bg-black/15 p-1 max-w-[220px] overflow-x-auto">
+            {getEnabledChainIds().map((id) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setChainId(id as SupportedChainId)}
+                className={`shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-medium ${
+                  chainId === id
+                    ? 'bg-white text-sky-deep'
+                    : 'text-white/85 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                {getChainName(id)}
+              </button>
+            ))}
           </div>
           <WalletButton onBrand />
         </div>

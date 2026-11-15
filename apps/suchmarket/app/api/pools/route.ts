@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Address, isAddress } from 'viem'
-import { discoverPools } from '@/lib/indexer'
-import { isSupportedChainId } from '@/lib/chains'
+import { queryPools } from '@/lib/indexer'
+import { isChainOperational, isSupportedChainId } from '@/lib/chains'
 
 // Process-local cache (fine for Vercel serverless warm instances)
 const cache = new Map<string, { data: unknown; timestamp: number }>()
 const CACHE_TTL = 60_000
 
-function serializePools(pools: Awaited<ReturnType<typeof discoverPools>>) {
+function serializePools(pools: Awaited<ReturnType<typeof queryPools>>['pools']) {
   return pools.map((p) => ({
     poolAddress: p.poolAddress,
     nft: p.nft,
@@ -36,6 +36,12 @@ export async function GET(request: NextRequest) {
     if (!isSupportedChainId(chainId)) {
       return NextResponse.json({ error: 'Unsupported chain' }, { status: 400 })
     }
+    if (!isChainOperational(chainId)) {
+      return NextResponse.json(
+        { error: `Chain ${chainId} is not configured (set factory env vars)` },
+        { status: 400 }
+      )
+    }
 
     const nft = searchParams.get('nft')
     const owner = searchParams.get('owner')
@@ -54,7 +60,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ pools: cached.data, cached: true })
     }
 
-    const pools = await discoverPools({
+    const { pools, source } = await queryPools({
       chainId,
       nftContract: nft ? (nft as Address) : undefined,
       owner: owner ? (owner as Address) : undefined,
@@ -63,7 +69,7 @@ export async function GET(request: NextRequest) {
 
     const data = serializePools(pools)
     cache.set(cacheKey, { data, timestamp: Date.now() })
-    return NextResponse.json({ pools: data, cached: false })
+    return NextResponse.json({ pools: data, cached: false, source })
   } catch (error) {
     console.error('Pool discovery error:', error)
     return NextResponse.json(
